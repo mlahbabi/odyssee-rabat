@@ -3559,6 +3559,14 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
       fun:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/><circle cx="9" cy="10" r=".6" fill="currentColor"/><circle cx="15" cy="10" r=".6" fill="currentColor"/></svg>'
     };
 
+    // Default TTL per type (ms). null = manuel dismiss. Override par n.ttl dans le JSON.
+    const DEFAULT_TTL = {
+      info:   12000,
+      game:   10000,
+      fun:    15000,
+      urgent: null
+    };
+
     function escapeHtml(s){
       return String(s || '').replace(/[&<>"']/g, function(c){
         return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[c];
@@ -3575,7 +3583,16 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
       el.className = 'notif notif--' + type;
       el.setAttribute('data-notif-id', n.id);
 
-      const ttl = (typeof n.ttl === 'number' && n.ttl > 0) ? n.ttl : null;
+      // Resolve TTL: explicit n.ttl wins (null = manuel), else default per type
+      let ttl;
+      if (n.ttl === null) {
+        ttl = null;
+      } else if (typeof n.ttl === 'number' && n.ttl > 0) {
+        ttl = n.ttl;
+      } else {
+        ttl = DEFAULT_TTL[type];
+        if (ttl === undefined) ttl = 10000;
+      }
       if (ttl) el.style.setProperty('--ttl', ttl + 'ms');
 
       const icon = ICONS[type] || ICONS.info;
