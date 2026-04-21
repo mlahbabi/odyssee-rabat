@@ -727,21 +727,24 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
   flex: 1;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 5px;
+  gap: 4px;
   color: var(--muted);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.1em;
+  font-size: 8.5px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   font-weight: 500;
-  padding: 10px 4px 8px;
+  padding: 10px 2px 8px;
   cursor: pointer;
   border: 0;
   background: transparent;
   position: relative;
   transition: color 200ms;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
 }
-.tab svg { width: 20px; height: 20px; stroke-width: 1.6; }
+.tab svg { width: 19px; height: 19px; stroke-width: 1.6; flex-shrink: 0; }
 .tab.active { color: var(--green); }
 .tab.active::after {
   content: '';
@@ -2305,6 +2308,226 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
   --nc-border: rgba(192,132,252,0.30);
 }
 
+/* ===== MUR PHOTOS ===== */
+.photos-header { padding: 28px 24px 16px; }
+.photos-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+  margin: 10px 0 10px;
+  color: var(--text);
+}
+.photos-title em {
+  font-style: normal;
+  color: var(--muted);
+  font-weight: 500;
+}
+.photos-sub {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--muted);
+  max-width: 320px;
+}
+
+.photos-action {
+  padding: 4px 20px 14px;
+}
+.photos-upload-btn {
+  width: 100%;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px 16px;
+  background: var(--green);
+  color: #000;
+  border: 0;
+  border-radius: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 150ms, transform 150ms, opacity 150ms;
+  box-shadow: 0 0 24px -6px rgba(132,196,65,0.4);
+}
+.photos-upload-btn:hover:not(:disabled) { background: var(--green-glow); }
+.photos-upload-btn:active:not(:disabled) { transform: scale(0.98); }
+.photos-upload-btn:disabled {
+  background: #0a0b0f;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+.photos-upload-btn svg { width: 18px; height: 18px; }
+.photos-upload-btn.is-uploading .photos-upload-lbl::after {
+  content: '…';
+  display: inline-block;
+  animation: dots 1.2s steps(4, end) infinite;
+}
+@keyframes dots {
+  0%, 20% { content: ''; }
+  40% { content: '.'; }
+  60% { content: '..'; }
+  80%, 100% { content: '…'; }
+}
+
+.photos-meta {
+  display: flex; align-items: center; gap: 8px;
+  padding: 0 24px 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.photos-meta-count {
+  color: var(--text);
+  font-weight: 600;
+}
+.photos-meta-sep {
+  width: 1px; height: 10px; background: var(--line-strong);
+}
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 0 4px 20px;
+}
+.photo-cell {
+  position: relative;
+  aspect-ratio: 1;
+  background: #0a0b0f;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  animation: photoIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes photoIn {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.photo-cell img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 400ms ease;
+}
+.photo-cell:hover img { transform: scale(1.04); }
+.photo-cell.is-new::before {
+  content: 'NEW';
+  position: absolute;
+  top: 6px; left: 6px;
+  padding: 2px 6px;
+  background: var(--green);
+  color: #000;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  border-radius: 3px;
+  z-index: 2;
+}
+.photo-cell.is-mine::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border: 2px solid var(--green);
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.photos-empty {
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 40px 32px 20px;
+  gap: 14px;
+}
+.photos-empty.is-hidden { display: none; }
+.photos-empty-ic {
+  width: 72px; height: 72px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 14px;
+  display: grid; place-items: center;
+  color: var(--muted-2);
+}
+.photos-empty-ic svg { width: 32px; height: 32px; }
+.photos-empty-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: var(--text);
+}
+.photos-empty-sub {
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 240px;
+  line-height: 1.5;
+}
+
+/* Fullscreen photo viewer */
+.photo-viewer {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.96);
+  z-index: 50;
+  display: none;
+  flex-direction: column;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  animation: viewerIn 0.3s ease-out;
+}
+.photo-viewer.is-open { display: flex; }
+@keyframes viewerIn { from { opacity: 0; } to { opacity: 1; } }
+.photo-viewer-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.photo-viewer-idx {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+}
+.photo-viewer-close {
+  width: 32px; height: 32px;
+  background: rgba(255,255,255,0.08);
+  border: 0;
+  border-radius: 50%;
+  color: var(--text);
+  cursor: pointer;
+  display: grid; place-items: center;
+}
+.photo-viewer-close svg { width: 14px; height: 14px; }
+.photo-viewer-img-wrap {
+  flex: 1;
+  display: grid; place-items: center;
+  min-height: 0;
+  overflow: hidden;
+}
+.photo-viewer-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+}
+.photo-viewer-meta {
+  text-align: center;
+  padding-top: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+
+/* Upload error toast (fallback si bannière notif pas dispo) */
+.photos-upload-btn.is-error {
+  background: #1a0a0a;
+  color: #EF4444;
+  border: 1px solid rgba(239,68,68,0.3);
+}
+
 /* Screen foot */
 .screen-foot {
   display: flex; align-items: center; gap: 10px;
@@ -2340,6 +2563,20 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 
       <!-- NOTIF STACK (bannières live) -->
       <div class="notif-stack" id="notif-stack" aria-live="polite"></div>
+
+      <!-- PHOTO VIEWER (plein écran) -->
+      <div class="photo-viewer" id="photo-viewer" aria-hidden="true">
+        <div class="photo-viewer-top">
+          <span class="photo-viewer-idx" id="photo-viewer-idx">—</span>
+          <button class="photo-viewer-close" id="photo-viewer-close" aria-label="Fermer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div class="photo-viewer-img-wrap">
+          <img class="photo-viewer-img" id="photo-viewer-img" alt="">
+        </div>
+        <div class="photo-viewer-meta" id="photo-viewer-meta">—</div>
+      </div>
 
       <!-- TOP BAR -->
       <header class="top-bar">
@@ -2734,6 +2971,56 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 
         </section>
 
+        <!-- ============== PHOTOS ============== -->
+        <section class="screen" data-screen="photos">
+
+          <header class="photos-header">
+            <div class="eyebrow"><span class="dot"></span>MUR PHOTOS · LIVE</div>
+            <h1 class="photos-title">CAPTURE<br/>L'<em>INSTANT.</em></h1>
+            <p class="photos-sub">Ajoute tes clichés du jour. Ils s'affichent en live sur le mur de toute la team — 135 décodeurs en direct.</p>
+          </header>
+
+          <div class="photos-action">
+            <button class="photos-upload-btn" id="photos-upload-btn" type="button" disabled>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="6" width="18" height="14" rx="2"/>
+                <circle cx="12" cy="13" r="3.5"/>
+                <path d="M8.5 6L10 3.5h4L15.5 6"/>
+              </svg>
+              <span class="photos-upload-lbl">MUR ACTIVÉ LE JOUR J</span>
+            </button>
+            <input type="file" accept="image/*" id="photos-file-input" style="display:none" capture="environment">
+          </div>
+
+          <div class="photos-meta">
+            <span class="photos-meta-count" data-photos="count">—</span>
+            <span>clichés</span>
+            <span class="photos-meta-sep"></span>
+            <span class="photos-meta-updated" data-photos="updated">En attente du jour J</span>
+          </div>
+
+          <div class="photos-grid" id="photos-grid" aria-label="Mur photos"></div>
+
+          <div class="photos-empty" id="photos-empty">
+            <div class="photos-empty-ic">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="6" y="12" width="36" height="28" rx="3"/>
+                <circle cx="24" cy="26" r="7"/>
+                <path d="M17 12l3-5h8l3 5"/>
+              </svg>
+            </div>
+            <div class="photos-empty-title">PAS ENCORE DE PHOTO</div>
+            <div class="photos-empty-sub">Le mur s'active dès les premières photos du jour. Reviens après le coup d'envoi.</div>
+          </div>
+
+          <div class="screen-foot">
+            <div class="foot-dash"></div>
+            <div class="foot-txt">ODYSSÉE · RABAT · 25 AVR 2026</div>
+            <div class="foot-dash"></div>
+          </div>
+
+        </section>
+
         <!-- ============== PLUS ============== -->
         <section class="screen" data-screen="plus">
 
@@ -3096,6 +3383,14 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
             <circle cx="12" cy="9" r="2.5"/>
           </svg>
           Lieu
+        </button>
+        <button class="tab" data-tab="photos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="6" width="18" height="14" rx="2"/>
+            <circle cx="12" cy="13" r="3.5"/>
+            <path d="M8.5 6L10 3.5h4L15.5 6"/>
+          </svg>
+          Photos
         </button>
         <button class="tab" data-tab="plus">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
@@ -3663,6 +3958,277 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
     }
     checkCountdown();
     setInterval(checkCountdown, 30000);
+  })();
+
+  /* ===== MUR PHOTOS =====
+     - Upload direct → Cloudinary (unsigned upload preset, tag event-scope)
+     - Liste dynamique via endpoint public Cloudinary list.json (filtré par tag)
+     - Modération : /data/photo-moderation.json avec IDs à masquer (mis à jour
+       par commit depuis le chat back-office)
+     - Viewer plein écran sur tap */
+  (function initPhotos(){
+    // ==== CONFIGURATION CLOUDINARY (à remplir quand Mehdi donne les creds) ====
+    const CLOUDINARY_CLOUD  = '';           // ex: 'mrco-odyssee'
+    const CLOUDINARY_PRESET = '';           // ex: 'odyssee_upload'
+    const CLOUDINARY_TAG    = 'odyssee-rabat';
+    // ==========================================================================
+
+    const grid      = document.getElementById('photos-grid');
+    const emptyEl   = document.getElementById('photos-empty');
+    const uploadBtn = document.getElementById('photos-upload-btn');
+    const fileInput = document.getElementById('photos-file-input');
+    const countEl   = document.querySelector('[data-photos="count"]');
+    const updatedEl = document.querySelector('[data-photos="updated"]');
+    const viewer    = document.getElementById('photo-viewer');
+    const viewerImg = document.getElementById('photo-viewer-img');
+    const viewerIdx = document.getElementById('photo-viewer-idx');
+    const viewerMeta= document.getElementById('photo-viewer-meta');
+    const viewerClose = document.getElementById('photo-viewer-close');
+    if (!grid) return;
+
+    const ENABLED = !!(CLOUDINARY_CLOUD && CLOUDINARY_PRESET);
+    let photos = [];              // [{ public_id, secure_url, thumb_url, uploaded_at }]
+    let hiddenIds = new Set();    // IDs masqués par la modération
+    let mineIds = new Set();      // IDs uploadés par CE device
+    let seenOnFirstLoad = new Set();
+
+    // Enable upload button if creds are branchées
+    if (ENABLED) {
+      uploadBtn.disabled = false;
+      uploadBtn.querySelector('.photos-upload-lbl').textContent = 'AJOUTER UNE PHOTO';
+    }
+
+    // Track "mes photos" across reload
+    try {
+      const saved = JSON.parse(localStorage.getItem('odyssee.photos.mine') || '[]');
+      saved.forEach(function(id){ mineIds.add(id); });
+    } catch(e){}
+
+    function saveMine(){
+      try { localStorage.setItem('odyssee.photos.mine', JSON.stringify(Array.from(mineIds))); } catch(e){}
+    }
+
+    function fmtTime(iso){
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        return d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+      } catch(e){ return '—'; }
+    }
+
+    function thumbUrl(publicId){
+      // Cloudinary transform: 400x400 fill + auto quality + auto format
+      return 'https://res.cloudinary.com/' + CLOUDINARY_CLOUD +
+             '/image/upload/c_fill,w_400,h_400,q_auto,f_auto/' + publicId;
+    }
+    function fullUrl(publicId){
+      return 'https://res.cloudinary.com/' + CLOUDINARY_CLOUD +
+             '/image/upload/c_limit,w_1600,q_auto,f_auto/' + publicId;
+    }
+
+    function renderGrid(){
+      // Filter out moderated photos
+      const visible = photos.filter(function(p){ return !hiddenIds.has(p.public_id); });
+      countEl.textContent = visible.length;
+
+      if (!visible.length) {
+        grid.innerHTML = '';
+        emptyEl.classList.remove('is-hidden');
+        return;
+      }
+      emptyEl.classList.add('is-hidden');
+
+      // Newest first
+      visible.sort(function(a,b){
+        return (b.uploaded_at || 0) - (a.uploaded_at || 0);
+      });
+
+      grid.innerHTML = visible.map(function(p, i){
+        const isNew = !seenOnFirstLoad.has(p.public_id);
+        const isMine = mineIds.has(p.public_id);
+        const cls = 'photo-cell' + (isNew ? ' is-new' : '') + (isMine ? ' is-mine' : '');
+        return '<div class="' + cls + '" data-pid="' + p.public_id + '" data-idx="' + (i+1) + '" data-total="' + visible.length + '">' +
+               '<img loading="lazy" src="' + thumbUrl(p.public_id) + '" alt="Photo Odyssée">' +
+               '</div>';
+      }).join('');
+    }
+
+    function openViewer(publicId){
+      const visible = photos.filter(function(p){ return !hiddenIds.has(p.public_id); });
+      visible.sort(function(a,b){ return (b.uploaded_at || 0) - (a.uploaded_at || 0); });
+      const idx = visible.findIndex(function(p){ return p.public_id === publicId; });
+      if (idx === -1) return;
+      const p = visible[idx];
+      viewerImg.src = fullUrl(p.public_id);
+      viewerIdx.textContent = String(idx+1).padStart(2,'0') + ' / ' + String(visible.length).padStart(2,'0');
+      viewerMeta.textContent = 'MIS EN LIGNE À ' + fmtTime(new Date(p.uploaded_at).toISOString()).toUpperCase();
+      viewer.classList.add('is-open');
+      viewer.setAttribute('aria-hidden', 'false');
+    }
+    function closeViewer(){
+      viewer.classList.remove('is-open');
+      viewer.setAttribute('aria-hidden', 'true');
+      viewerImg.src = '';
+    }
+    viewerClose.addEventListener('click', closeViewer);
+    viewer.addEventListener('click', function(e){
+      if (e.target === viewer || e.target === viewerImg.parentNode) closeViewer();
+    });
+
+    grid.addEventListener('click', function(e){
+      const cell = e.target.closest('.photo-cell');
+      if (cell) openViewer(cell.getAttribute('data-pid'));
+    });
+
+    // ----- Moderation polling -----
+    function fetchModeration(){
+      fetch('/data/photo-moderation.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if (!data || !Array.isArray(data.hiddenIds)) return;
+          hiddenIds = new Set(data.hiddenIds);
+          renderGrid();
+        })
+        .catch(function(){});
+    }
+
+    // ----- Cloudinary list polling -----
+    function fetchPhotos(){
+      if (!ENABLED) return;
+      fetch('https://res.cloudinary.com/' + CLOUDINARY_CLOUD + '/image/list/' + CLOUDINARY_TAG + '.json?t=' + Date.now())
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if (!data || !Array.isArray(data.resources)) return;
+          const prevIds = new Set(photos.map(function(p){ return p.public_id; }));
+          if (!prevIds.size) {
+            // First load: snapshot IDs to mark everything as "seen" (no NEW badge)
+            data.resources.forEach(function(r){ seenOnFirstLoad.add(r.public_id); });
+          }
+          photos = data.resources.map(function(r){
+            return {
+              public_id: r.public_id,
+              secure_url: 'https://res.cloudinary.com/' + CLOUDINARY_CLOUD + '/image/upload/' + r.public_id,
+              uploaded_at: r.created_at ? Date.parse(r.created_at) : (r.uploaded_at || Date.now())
+            };
+          });
+          updatedEl.textContent = 'Sync ' + fmtTime(new Date().toISOString());
+          renderGrid();
+        })
+        .catch(function(){
+          updatedEl.textContent = 'Hors ligne — nouvelle tentative…';
+        });
+    }
+
+    // ----- Upload handler -----
+    async function compressImage(file, maxDim) {
+      return new Promise(function(resolve, reject){
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = function(e){ img.src = e.target.result; };
+        reader.onerror = reject;
+        img.onload = function(){
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+            else       { w = Math.round(w * (maxDim / h)); h = maxDim; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob(function(blob){
+            if (!blob) return reject(new Error('compression'));
+            resolve(blob);
+          }, 'image/jpeg', 0.85);
+        };
+        img.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadToCloudinary(blob){
+      const fd = new FormData();
+      fd.append('file', blob);
+      fd.append('upload_preset', CLOUDINARY_PRESET);
+      fd.append('tags', CLOUDINARY_TAG);
+      const res = await fetch('https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD + '/image/upload', {
+        method: 'POST', body: fd
+      });
+      if (!res.ok) throw new Error('upload ' + res.status);
+      return res.json();
+    }
+
+    async function handleFile(file){
+      if (!ENABLED) return;
+      const lblEl = uploadBtn.querySelector('.photos-upload-lbl');
+      const originalLbl = lblEl.textContent;
+      uploadBtn.disabled = true;
+      uploadBtn.classList.add('is-uploading');
+      lblEl.textContent = 'ENVOI EN COURS';
+      try {
+        const blob = await compressImage(file, 1600);
+        const result = await uploadToCloudinary(blob);
+        if (result && result.public_id) {
+          mineIds.add(result.public_id);
+          saveMine();
+          // Optimistic insert before polling catches up
+          photos.unshift({
+            public_id: result.public_id,
+            secure_url: result.secure_url,
+            uploaded_at: Date.now()
+          });
+          renderGrid();
+          lblEl.textContent = 'PHOTO AJOUTÉE ✓';
+          setTimeout(function(){ lblEl.textContent = originalLbl; }, 2200);
+          // Fire fun notif for the pax's own feedback
+          if (window.__odysseeNotify) {
+            window.__odysseeNotify({
+              id: 'self.photo.' + result.public_id,
+              type: 'fun',
+              title: 'PHOTO EN LIGNE',
+              body: 'Ta photo est maintenant sur le mur.',
+              ttl: 5000
+            });
+          }
+        } else {
+          throw new Error('response');
+        }
+      } catch (err) {
+        uploadBtn.classList.add('is-error');
+        lblEl.textContent = 'ÉCHEC · RÉESSAIE';
+        setTimeout(function(){
+          uploadBtn.classList.remove('is-error');
+          lblEl.textContent = originalLbl;
+        }, 3000);
+      } finally {
+        uploadBtn.classList.remove('is-uploading');
+        uploadBtn.disabled = false;
+        fileInput.value = '';
+      }
+    }
+
+    uploadBtn.addEventListener('click', function(){
+      if (!ENABLED) return;
+      fileInput.click();
+    });
+    fileInput.addEventListener('change', function(){
+      const f = fileInput.files && fileInput.files[0];
+      if (f) handleFile(f);
+    });
+
+    // Initial render (empty state visible by default)
+    renderGrid();
+
+    // Kick off polling
+    fetchModeration();
+    if (ENABLED) fetchPhotos();
+    setInterval(fetchModeration, 10000);
+    setInterval(fetchPhotos, 10000);
+    document.addEventListener('visibilitychange', function(){
+      if (!document.hidden) {
+        fetchModeration();
+        if (ENABLED) fetchPhotos();
+      }
+    });
   })();
 
 })();
