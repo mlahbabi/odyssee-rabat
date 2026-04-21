@@ -1917,6 +1917,268 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
   color: var(--muted);
   line-height: 1.4;
 }
+.soon-grid--single { grid-template-columns: 1fr; }
+
+/* ===== SCOREBOARD LIVE ===== */
+.scoreboard-block {
+  margin-top: 28px;
+  padding: 16px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #07080b 0%, #050608 100%);
+  position: relative;
+  overflow: hidden;
+}
+.scoreboard-block::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(1200px 200px at 50% -50px, rgba(132,196,65,0.08), transparent 60%),
+    radial-gradient(800px 160px at 100% 100%, rgba(132,196,65,0.04), transparent 60%);
+  pointer-events: none;
+}
+.sb-head { position: relative; z-index: 1; text-align: left; }
+.sb-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px; font-weight: 600;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--green);
+}
+.sb-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 3px rgba(132,196,65,0.18), 0 0 10px rgba(132,196,65,0.8);
+  animation: sbPulse 1.6s ease-in-out infinite;
+}
+@keyframes sbPulse {
+  0%,100% { box-shadow: 0 0 0 3px rgba(132,196,65,0.18), 0 0 10px rgba(132,196,65,0.8); }
+  50%     { box-shadow: 0 0 0 6px rgba(132,196,65,0.04), 0 0 14px rgba(132,196,65,1);   }
+}
+.sb-title {
+  margin: 10px 0 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.sb-title em {
+  font-style: normal;
+  color: var(--muted);
+  font-weight: 500;
+}
+.sb-meta {
+  margin-top: 10px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+.sb-chip {
+  display: inline-flex; align-items: center;
+  padding: 3px 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text);
+  background: rgba(255,255,255,0.02);
+}
+.sb-round {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+}
+.sb-sep { width: 1px; height: 10px; background: var(--line-strong); }
+
+/* Podium */
+.sb-podium {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr 1fr;
+  gap: 6px;
+  align-items: end;
+  margin-top: 18px;
+  margin-bottom: 4px;
+  min-height: 148px;
+}
+.sb-pod {
+  position: relative;
+  padding: 12px 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0a0b0f;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  overflow: hidden;
+  transition: transform 0.4s ease, border-color 0.4s ease;
+}
+.sb-pod::before {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 2px;
+  background: var(--pc, transparent);
+  opacity: 0.9;
+}
+.sb-pod--2 { height: 110px; }
+.sb-pod--1 { height: 140px; }
+.sb-pod--3 { height: 96px; }
+.sb-pod-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+.sb-pod--1 .sb-pod-rank { color: var(--green); }
+.sb-pod-swatch {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--pc, #333);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--pc, #333) 40%, transparent);
+}
+.sb-pod--1 .sb-pod-swatch { width: 28px; height: 28px; }
+.sb-pod-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text);
+  text-align: center;
+}
+.sb-pod-score {
+  margin-top: 2px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.sb-pod--1 .sb-pod-score { font-size: 22px; }
+.sb-pod-score-u {
+  font-size: 9px;
+  color: var(--muted);
+  margin-left: 2px;
+  letter-spacing: 0.1em;
+}
+.sb-pod-crown {
+  position: absolute;
+  top: 6px; right: 8px;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+/* Ranking */
+.sb-ranking-wrap {
+  position: relative; z-index: 1;
+  margin-top: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.sb-ranking-head {
+  display: grid;
+  grid-template-columns: 42px 1fr 56px;
+  align-items: center;
+  padding: 8px 12px;
+  background: #0a0b0f;
+  border-bottom: 1px solid var(--line);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  color: var(--muted-2);
+}
+.sb-ranking-head span:last-child { text-align: right; }
+.sb-ranking { display: flex; flex-direction: column; }
+.sb-row {
+  display: grid;
+  grid-template-columns: 42px 1fr 56px;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.3s ease;
+  position: relative;
+}
+.sb-row:last-child { border-bottom: 0; }
+.sb-row.is-me { background: rgba(132,196,65,0.05); }
+.sb-row.is-me::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--green);
+}
+.sb-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+}
+.sb-row.is-top3 .sb-rank { color: var(--text); font-weight: 600; }
+.sb-team {
+  display: flex; align-items: center; gap: 10px;
+  min-width: 0;
+}
+.sb-team-swatch {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--tc, #333);
+  border: 1px solid rgba(255,255,255,0.12);
+  flex-shrink: 0;
+}
+.sb-team-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sb-me-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8.5px;
+  color: var(--green);
+  letter-spacing: 0.12em;
+  margin-left: 4px;
+}
+.sb-score {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+.sb-score.bump {
+  color: var(--green);
+  transform: scale(1.12);
+}
+
+/* Footer */
+.sb-foot {
+  position: relative; z-index: 1;
+  margin-top: 12px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+}
+.sb-pulse {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--muted);
+  animation: sbTick 2s ease-in-out infinite;
+}
+.sb-pulse.is-live { background: var(--green); box-shadow: 0 0 8px rgba(132,196,65,0.6); }
+@keyframes sbTick {
+  0%,100% { opacity: 0.4; }
+  50%     { opacity: 1; }
+}
+.sb-foot-txt { font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+
+/* Skeleton rows before first fetch */
+.sb-ranking.is-loading .sb-row .sb-team-name,
+.sb-ranking.is-loading .sb-row .sb-score,
+.sb-ranking.is-loading .sb-row .sb-rank {
+  opacity: 0.3;
+}
 
 /* Screen foot */
 .screen-foot {
@@ -2617,26 +2879,51 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 
           </div>
 
+          <!-- ============ SCOREBOARD LIVE ============ -->
+          <section class="scoreboard-block" id="scoreboard">
+            <header class="sb-head">
+              <div class="sb-eyebrow">
+                <span class="sb-dot"></span>
+                <span>SCOREBOARD · LIVE</span>
+              </div>
+              <h2 class="sb-title">CLASSEMENT<br/><em>DES 9 ÉQUIPES</em></h2>
+              <div class="sb-meta">
+                <span class="sb-chip" data-sb="status">En attente du coup d'envoi</span>
+                <span class="sb-sep"></span>
+                <span class="sb-round" data-sb="round">Round 0/6</span>
+              </div>
+            </header>
+
+            <div class="sb-podium" data-sb="podium" aria-label="Podium"></div>
+
+            <div class="sb-ranking-wrap">
+              <div class="sb-ranking-head">
+                <span>RANG</span>
+                <span>ÉQUIPE</span>
+                <span>PTS</span>
+              </div>
+              <div class="sb-ranking" data-sb="ranking" aria-label="Classement complet"></div>
+            </div>
+
+            <div class="sb-foot">
+              <span class="sb-pulse"></span>
+              <span class="sb-foot-txt" data-sb="updated">Synchronisation…</span>
+            </div>
+          </section>
+
           <!-- Bientôt -->
           <div class="plus-soon">
             <div class="soon-head">
               <div class="soon-dot"></div>
-              <div class="soon-label">BIENTÔT · DÉBLOQUÉS LE JOUR J</div>
+              <div class="soon-label">BIENTÔT · DÉBLOQUÉ LE JOUR J</div>
             </div>
-            <div class="soon-grid">
+            <div class="soon-grid soon-grid--single">
               <div class="soon-tile">
                 <div class="soon-icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="12" cy="12" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>
                 </div>
                 <div class="soon-title">MUR PHOTOS</div>
                 <div class="soon-sub">Partage tes meilleurs clichés en live</div>
-              </div>
-              <div class="soon-tile">
-                <div class="soon-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 4 3 5-6"/></svg>
-                </div>
-                <div class="soon-title">SCOREBOARD LIVE</div>
-                <div class="soon-sub">Le classement des 9 équipes en temps réel</div>
               </div>
             </div>
           </div>
@@ -2883,6 +3170,9 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
     const members = teamsData[teamNum];
     if (!members) return;
 
+    // Persist selection so the scoreboard can highlight "TOI"
+    try { localStorage.setItem('odyssee.team', String(teamNum)); } catch(e){}
+
     teamDetail.style.setProperty('--tc', color);
     teamDetail.style.setProperty('color-scheme', 'dark');
 
@@ -2923,6 +3213,140 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
     if (screen) screen.scrollTop = 0;
   }
   if (teamBack) teamBack.addEventListener('click', closeTeamDetail);
+
+  /* ===== SCOREBOARD LIVE =====
+     Polls /data/scoreboard.json every 5 sec and renders podium + ranking.
+     Back-office: Mehdi dicte les scores en chat → commit JSON → redeploy Netlify. */
+  (function initScoreboard(){
+    const podiumEl  = document.querySelector('[data-sb="podium"]');
+    const rankingEl = document.querySelector('[data-sb="ranking"]');
+    const statusEl  = document.querySelector('[data-sb="status"]');
+    const roundEl   = document.querySelector('[data-sb="round"]');
+    const updatedEl = document.querySelector('[data-sb="updated"]');
+    const pulseEl   = document.querySelector('.sb-pulse');
+    if (!podiumEl || !rankingEl) return;
+
+    const fallbackColors = { 1:'#06B6D4', 2:'#A855F7', 3:'#F97316', 4:'#3B82F6', 5:'#FACC15', 6:'#EF4444', 7:'#14B8A6', 8:'#EC4899', 9:'#F5F5F5' };
+    let lastScores = {};
+    let renderedOnce = false;
+
+    function getMyTeam(){
+      try { return localStorage.getItem('odyssee.team') || null; } catch(e){ return null; }
+    }
+
+    function fmtTime(iso){
+      if (!iso) return '—';
+      try {
+        const d = new Date(iso);
+        if (isNaN(d.getTime())) return '—';
+        return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      } catch(e){ return '—'; }
+    }
+
+    function sortTeams(teams){
+      // Higher score first; tie-break by id ascending for stability.
+      return teams.slice().sort(function(a,b){
+        if (b.score !== a.score) return b.score - a.score;
+        return a.id - b.id;
+      });
+    }
+
+    function renderPodium(sorted){
+      // Podium order in DOM: 2nd, 1st, 3rd (center-focused layout).
+      const positions = [
+        { rank: 2, cls: 'sb-pod--2', team: sorted[1] },
+        { rank: 1, cls: 'sb-pod--1', team: sorted[0] },
+        { rank: 3, cls: 'sb-pod--3', team: sorted[2] }
+      ];
+      podiumEl.innerHTML = positions.map(function(p){
+        if (!p.team) return '<div class="sb-pod ' + p.cls + '"></div>';
+        const c = p.team.color || fallbackColors[p.team.id] || '#333';
+        const crown = p.rank === 1 ? '<span class="sb-pod-crown">★</span>' : '';
+        return '<div class="sb-pod ' + p.cls + '" style="--pc:' + c + '">' +
+               crown +
+               '<div class="sb-pod-rank">' + String(p.rank).padStart(2,'0') + '</div>' +
+               '<div class="sb-pod-swatch"></div>' +
+               '<div class="sb-pod-name">' + p.team.name + '</div>' +
+               '<div class="sb-pod-score">' + p.team.score + '<span class="sb-pod-score-u">PTS</span></div>' +
+               '</div>';
+      }).join('');
+    }
+
+    function renderRanking(sorted){
+      const myTeamId = getMyTeam();
+      const myTeamNum = myTeamId ? parseInt(myTeamId, 10) : null;
+      rankingEl.innerHTML = sorted.map(function(t, i){
+        const rank = i + 1;
+        const c = t.color || fallbackColors[t.id] || '#333';
+        const isMe = myTeamNum && myTeamNum === t.id;
+        const prev = lastScores[t.id];
+        const bumped = renderedOnce && typeof prev === 'number' && t.score > prev;
+        return '<div class="sb-row' + (isMe ? ' is-me' : '') + (rank <= 3 ? ' is-top3' : '') + '">' +
+               '<span class="sb-rank">' + String(rank).padStart(2,'0') + '</span>' +
+               '<span class="sb-team">' +
+                 '<span class="sb-team-swatch" style="--tc:' + c + '"></span>' +
+                 '<span class="sb-team-name">Équipe ' + t.name + '</span>' +
+                 (isMe ? '<span class="sb-me-tag">· TOI</span>' : '') +
+               '</span>' +
+               '<span class="sb-score' + (bumped ? ' bump' : '') + '" data-sb-team="' + t.id + '">' + t.score + '</span>' +
+               '</div>';
+      }).join('');
+
+      // Clear bump animation after 600ms
+      if (renderedOnce) {
+        setTimeout(function(){
+          rankingEl.querySelectorAll('.sb-score.bump').forEach(function(el){ el.classList.remove('bump'); });
+        }, 600);
+      }
+
+      // Snapshot for next diff
+      sorted.forEach(function(t){ lastScores[t.id] = t.score; });
+      renderedOnce = true;
+    }
+
+    function render(data){
+      const teams = Array.isArray(data.teams) ? data.teams : [];
+      const sorted = sortTeams(teams);
+      renderPodium(sorted);
+      rankingEl.classList.remove('is-loading');
+      renderRanking(sorted);
+      if (statusEl)  statusEl.textContent  = data.statusLabel || (data.status === 'live' ? 'En cours' : (data.status === 'final' ? 'Classement final' : 'En attente'));
+      if (roundEl)   roundEl.textContent   = 'Round ' + (data.round || 0) + '/' + (data.totalRounds || 6);
+      if (updatedEl) updatedEl.textContent = 'Sync ' + fmtTime(data.updatedAt);
+      if (pulseEl)   pulseEl.classList.add('is-live');
+    }
+
+    function renderError(){
+      if (updatedEl) updatedEl.textContent = 'Hors ligne — nouvelle tentative…';
+      if (pulseEl)   pulseEl.classList.remove('is-live');
+    }
+
+    function fetchScoreboard(){
+      fetch('/data/scoreboard.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(render)
+        .catch(renderError);
+    }
+
+    // Prime skeleton with 9 empty rows
+    rankingEl.classList.add('is-loading');
+    const skeleton = [];
+    for (let i = 1; i <= 9; i++) {
+      skeleton.push({ id: i, name: '—', score: 0, color: fallbackColors[i] });
+    }
+    renderPodium(skeleton);
+    renderRanking(skeleton);
+    renderedOnce = false;
+    lastScores = {};
+
+    fetchScoreboard();
+    setInterval(fetchScoreboard, 5000);
+
+    // Re-fetch immediately when the user comes back to the tab
+    document.addEventListener('visibilitychange', function(){
+      if (!document.hidden) fetchScoreboard();
+    });
+  })();
 
 })();
 </script>
