@@ -1,11 +1,4 @@
 {
-  "updatedAt": "2026-04-21T22:33:42Z",
-  "notifs": [
-    {
-      "id": "test.fun.20260421.2233.younes",
-      "type": "fun",
-      "title": "GAGNANT",
-      "body": "Ba Younes, tu as gagné !"
-    }
-  ]
+  "updatedAt": "2026-04-21T22:35:54Z",
+  "notifs": []
 }
