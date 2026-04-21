@@ -2180,6 +2180,131 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
   opacity: 0.3;
 }
 
+/* ===== NOTIFICATIONS / BANNIÈRES ===== */
+.notif-stack {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  padding: calc(8px + env(safe-area-inset-top, 0px)) 10px 0;
+  z-index: 40;
+  pointer-events: none;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.notif {
+  pointer-events: auto;
+  position: relative;
+  padding: 10px 34px 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--nc-border, var(--line-strong));
+  background: var(--nc-bg, rgba(10,11,15,0.96));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 10px 24px -12px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(255,255,255,0.02) inset;
+  display: flex; align-items: flex-start; gap: 10px;
+  animation: notifIn 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: top center;
+  overflow: hidden;
+}
+.notif.is-leaving {
+  animation: notifOut 0.25s ease-in forwards;
+}
+@keyframes notifIn {
+  from { opacity: 0; transform: translateY(-14px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes notifOut {
+  to { opacity: 0; transform: translateY(-10px) scale(0.98); }
+}
+.notif::before {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--nc, var(--green));
+}
+.notif-icon {
+  width: 22px; height: 22px; flex-shrink: 0;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  color: var(--nc, var(--green));
+  background: color-mix(in srgb, var(--nc, #84C441) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--nc, #84C441) 40%, transparent);
+}
+.notif-icon svg { width: 12px; height: 12px; }
+.notif-body { flex: 1; min-width: 0; }
+.notif-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nc, var(--green));
+  line-height: 1.2;
+}
+.notif-msg {
+  margin-top: 2px;
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--text);
+  font-weight: 500;
+}
+.notif-close {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 22px; height: 22px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  display: grid; place-items: center;
+  border-radius: 4px;
+  padding: 0;
+}
+.notif-close:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.notif-close svg { width: 12px; height: 12px; }
+/* Auto-dismiss progress bar for notifs with ttl */
+.notif-progress {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: var(--nc, var(--green));
+  opacity: 0.6;
+  transform-origin: left center;
+  animation: notifProgress var(--ttl, 8s) linear forwards;
+}
+@keyframes notifProgress {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+
+/* Type: info (logistique) — bleu neutre */
+.notif--info {
+  --nc: #60A5FA;
+  --nc-border: rgba(96,165,250,0.25);
+}
+/* Type: game (jeu / scoreboard) — vert brand */
+.notif--game {
+  --nc: #84C441;
+  --nc-border: rgba(132,196,65,0.30);
+}
+/* Type: urgent — rouge, manuel */
+.notif--urgent {
+  --nc: #EF4444;
+  --nc-border: rgba(239,68,68,0.35);
+  animation: notifIn 0.35s cubic-bezier(0.22, 1, 0.36, 1), notifUrgentShake 0.6s ease-in-out 0.35s;
+}
+@keyframes notifUrgentShake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+/* Type: fun (résultats, shoutouts) — violet */
+.notif--fun {
+  --nc: #C084FC;
+  --nc-border: rgba(192,132,252,0.30);
+}
+
 /* Screen foot */
 .screen-foot {
   display: flex; align-items: center; gap: 10px;
@@ -2212,6 +2337,9 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 
   <div class="device">
     <div class="app">
+
+      <!-- NOTIF STACK (bannières live) -->
+      <div class="notif-stack" id="notif-stack" aria-live="polite"></div>
 
       <!-- TOP BAR -->
       <header class="top-bar">
@@ -3304,6 +3432,53 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
       renderedOnce = true;
     }
 
+    const SB_STATE_KEY = 'odyssee.scoreboard.state';
+    function getSbState(){ try { return JSON.parse(localStorage.getItem(SB_STATE_KEY) || '{}'); } catch(e){ return {}; } }
+    function setSbState(s){ try { localStorage.setItem(SB_STATE_KEY, JSON.stringify(s)); } catch(e){} }
+
+    function emitAutoNotifs(data, sorted){
+      if (!window.__odysseeNotify) return;
+      const prev = getSbState();
+      const newLeaderId = (sorted[0] && sorted[0].score > 0) ? sorted[0].id : null;
+      const newLeaderName = (sorted[0] && sorted[0].score > 0) ? sorted[0].name : null;
+      const totalRounds = data.totalRounds || 6;
+
+      // Skip emissions on the very first load (prev is empty)
+      if (prev.round !== undefined) {
+        // Round advance
+        if (typeof data.round === 'number' && data.round > (prev.round || 0) && data.round > 0) {
+          window.__odysseeNotify({
+            id: 'auto.round.' + data.round,
+            type: 'game',
+            title: 'ROUND ' + data.round + '/' + totalRounds,
+            body: 'Nouveau round. GO !',
+            ttl: 8000
+          });
+        }
+        // Leader change (only while live, not pre-event)
+        if (data.status === 'live' && newLeaderId && prev.leaderId && newLeaderId !== prev.leaderId) {
+          window.__odysseeNotify({
+            id: 'auto.leader.' + newLeaderId + '.r' + (data.round || 0),
+            type: 'fun',
+            title: 'NOUVELLE TÊTE',
+            body: 'Équipe ' + newLeaderName + ' prend la tête !',
+            ttl: 8000
+          });
+        }
+        // Final
+        if (data.status === 'final' && prev.status !== 'final' && newLeaderName) {
+          window.__odysseeNotify({
+            id: 'auto.final',
+            type: 'fun',
+            title: 'CLASSEMENT FINAL',
+            body: 'Équipe ' + newLeaderName + " remporte l'Odyssée !",
+            ttl: null
+          });
+        }
+      }
+      setSbState({ round: data.round || 0, leaderId: newLeaderId, status: data.status || 'pre-event' });
+    }
+
     function render(data){
       const teams = Array.isArray(data.teams) ? data.teams : [];
       const sorted = sortTeams(teams);
@@ -3314,6 +3489,7 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
       if (roundEl)   roundEl.textContent   = 'Round ' + (data.round || 0) + '/' + (data.totalRounds || 6);
       if (updatedEl) updatedEl.textContent = 'Sync ' + fmtTime(data.updatedAt);
       if (pulseEl)   pulseEl.classList.add('is-live');
+      emitAutoNotifs(data, sorted);
     }
 
     function renderError(){
@@ -3346,6 +3522,130 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
     document.addEventListener('visibilitychange', function(){
       if (!document.hidden) fetchScoreboard();
     });
+  })();
+
+  /* ===== NOTIFICATIONS LIVE =====
+     - Manual: dictées par Mehdi en chat → commit /data/notifications.json → push.
+     - Auto:   déclenchées côté client sur changements scoreboard + countdown event. */
+  (function initNotifications(){
+    const stack = document.getElementById('notif-stack');
+    if (!stack) return;
+
+    const DISMISSED_KEY = 'odyssee.notifs.dismissed';
+    const CTDN_KEY = 'odyssee.notifs.countdown';
+
+    function getDismissed(){
+      try { return JSON.parse(localStorage.getItem(DISMISSED_KEY) || '[]'); } catch(e){ return []; }
+    }
+    function markDismissed(id){
+      const s = getDismissed();
+      if (s.indexOf(id) === -1) {
+        s.push(id);
+        try { localStorage.setItem(DISMISSED_KEY, JSON.stringify(s)); } catch(e){}
+      }
+    }
+    function getCtdn(){
+      try { return JSON.parse(localStorage.getItem(CTDN_KEY) || '{}'); } catch(e){ return {}; }
+    }
+    function setCtdn(patch){
+      const s = Object.assign(getCtdn(), patch);
+      try { localStorage.setItem(CTDN_KEY, JSON.stringify(s)); } catch(e){}
+    }
+
+    const ICONS = {
+      info:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8.5v5M12 16.5v.01"/></svg>',
+      game:   '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 3 L13.5 10 L20 11 L13.5 12 L12 19 L10.5 12 L4 11 L10.5 10 Z"/></svg>',
+      urgent: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5 L2.5 21 h19 Z"/><path d="M12 9.5v5M12 18v.01"/></svg>',
+      fun:    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 14c1 1.5 2.5 2 4 2s3-.5 4-2"/><circle cx="9" cy="10" r=".6" fill="currentColor"/><circle cx="15" cy="10" r=".6" fill="currentColor"/></svg>'
+    };
+
+    function escapeHtml(s){
+      return String(s || '').replace(/[&<>"']/g, function(c){
+        return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[c];
+      });
+    }
+
+    function render(n){
+      if (!n || !n.id) return;
+      if (getDismissed().indexOf(n.id) !== -1) return;
+      if (stack.querySelector('[data-notif-id="' + CSS.escape(n.id) + '"]')) return;
+
+      const type = n.type || 'info';
+      const el = document.createElement('div');
+      el.className = 'notif notif--' + type;
+      el.setAttribute('data-notif-id', n.id);
+
+      const ttl = (typeof n.ttl === 'number' && n.ttl > 0) ? n.ttl : null;
+      if (ttl) el.style.setProperty('--ttl', ttl + 'ms');
+
+      const icon = ICONS[type] || ICONS.info;
+      el.innerHTML =
+        '<span class="notif-icon">' + icon + '</span>' +
+        '<div class="notif-body">' +
+          '<div class="notif-title">' + escapeHtml(n.title) + '</div>' +
+          '<div class="notif-msg">' + escapeHtml(n.body) + '</div>' +
+        '</div>' +
+        '<button class="notif-close" aria-label="Fermer">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>' +
+        '</button>' +
+        (ttl ? '<div class="notif-progress"></div>' : '');
+
+      // Cap stack at 3 visible — oldest leaves first
+      while (stack.children.length >= 3) stack.removeChild(stack.firstChild);
+      stack.appendChild(el);
+
+      function dismiss(){
+        if (el.classList.contains('is-leaving')) return;
+        markDismissed(n.id);
+        el.classList.add('is-leaving');
+        setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 260);
+      }
+      el.querySelector('.notif-close').addEventListener('click', dismiss);
+      if (ttl) setTimeout(dismiss, ttl);
+    }
+
+    // Exposed so the scoreboard (and tests) can fire auto-notifs
+    window.__odysseeNotify = render;
+
+    // ----- Manual notifs polling -----
+    function fetchNotifs(){
+      fetch('/data/notifications.json?t=' + Date.now(), { cache: 'no-store' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if (!data || !Array.isArray(data.notifs)) return;
+          data.notifs.forEach(render);
+        })
+        .catch(function(){});
+    }
+    fetchNotifs();
+    setInterval(fetchNotifs, 5000);
+    document.addEventListener('visibilitychange', function(){
+      if (!document.hidden) fetchNotifs();
+    });
+
+    // ----- Auto countdown notifs -----
+    const eventAt = new Date('2026-04-25T10:00:00+01:00').getTime();
+    function checkCountdown(){
+      const diff = eventAt - Date.now();
+      const state = getCtdn();
+      // H-1h
+      if (diff > 0 && diff <= 3600000 && !state.h1) {
+        render({ id: 'auto.ctdn.60', type: 'game', title: 'H-1', body: "L'Odyssée commence dans 1 heure. Rejoignez la plénière à temps.", ttl: 10000 });
+        setCtdn({ h1: true });
+      }
+      // H-10 min (urgent)
+      if (diff > 0 && diff <= 600000 && !state.h10) {
+        render({ id: 'auto.ctdn.10', type: 'urgent', title: 'H-10 MIN', body: "Briefing imminent. Tous en plénière maintenant.", ttl: null });
+        setCtdn({ h10: true });
+      }
+      // T = 0 (go live)
+      if (diff <= 0 && diff > -30*60000 && !state.t0) {
+        render({ id: 'auto.ctdn.0', type: 'game', title: "C'EST PARTI", body: "L'Odyssée Rabat démarre. Bonne chance aux 9 équipes !", ttl: 12000 });
+        setCtdn({ t0: true });
+      }
+    }
+    checkCountdown();
+    setInterval(checkCountdown, 30000);
   })();
 
 })();
