@@ -1,23 +1,11 @@
 {
-  "updatedAt": "2026-04-21T22:32:19Z",
+  "updatedAt": "2026-04-21T22:33:42Z",
   "notifs": [
     {
-      "id": "test.info.20260421.2232",
-      "type": "info",
-      "title": "LOGISTIQUE",
-      "body": "Pause café disponible salle Atlas jusqu'à 11h30."
-    },
-    {
-      "id": "test.game.20260421.2232",
-      "type": "game",
-      "title": "ROUND 2 / 6",
-      "body": "Dernière chance pour les bonus avant la mi-parcours."
-    },
-    {
-      "id": "test.urgent.20260421.2232",
-      "type": "urgent",
-      "title": "RASSEMBLEMENT",
-      "body": "Rendez-vous hall principal immédiatement."
+      "id": "test.fun.20260421.2233.younes",
+      "type": "fun",
+      "title": "GAGNANT",
+      "body": "Ba Younes, tu as gagné !"
     }
   ]
 }
