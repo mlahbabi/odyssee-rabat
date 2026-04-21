@@ -124,21 +124,10 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
   .app { border-radius: 0; }
 }
 
-/* ===== STATUS BAR (fake, desktop only) ===== */
-.status-bar {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 16px 28px 6px;
-  font-size: 13px; font-weight: 600;
-  color: var(--text);
-  flex-shrink: 0;
-}
-.status-bar .icons { display: flex; gap: 5px; align-items: center; font-size: 10px; }
-@media (max-width: 500px) { .status-bar { padding-top: env(safe-area-inset-top, 16px); } }
-
 /* ===== TOP BAR ===== */
 .top-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 20px 10px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px 10px;
   flex-shrink: 0;
   position: relative;
   z-index: 5;
@@ -1961,12 +1950,6 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 
   <div class="device">
     <div class="app">
-
-      <!-- Fake status bar (desktop only illusion) -->
-      <div class="status-bar">
-        <span>9:41</span>
-        <span class="icons">•••• &nbsp; 5G &nbsp; 94%</span>
-      </div>
 
       <!-- TOP BAR -->
       <header class="top-bar">
