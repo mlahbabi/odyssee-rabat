@@ -1,4 +1,12 @@
 {
-  "updatedAt": "2026-04-21T22:25:00Z",
-  "notifs": []
+  "updatedAt": "2026-04-21T22:29:39Z",
+  "notifs": [
+    {
+      "id": "manual.20260421.2229.younes",
+      "type": "fun",
+      "title": "YOUNES",
+      "body": "Hola — tu es réveillé ?",
+      "ttl": 10000
+    }
+  ]
 }
