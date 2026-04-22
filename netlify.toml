@@ -2,6 +2,13 @@
   publish = "."
   functions = "netlify/functions"
 
+[build.environment]
+  # Ces 3 clés sont marquées "secret" côté Netlify mais leurs valeurs
+  # ("main", "mlahbabi/odyssee-rabat", "8247") apparaissent naturellement
+  # dans le repo / metadata → faux positifs du scanner.
+  # Seul GITHUB_TOKEN reste scanné.
+  SECRETS_SCAN_OMIT_KEYS = "GITHUB_BRANCH,GITHUB_REPO,ADMIN_PIN"
+
 [functions]
   node_bundler = "esbuild"
 
