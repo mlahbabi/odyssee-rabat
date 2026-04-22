@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-22T11:04:25Z",
+  "updatedAt": "2026-04-22T11:20:18Z",
   "status": "pre-event",
   "statusLabel": "En attente du coup d'envoi",
   "round": 0,
@@ -9,7 +9,7 @@
       "id": 1,
       "name": "Cyan",
       "color": "#06B6D4",
-      "score": 1
+      "score": 0
     },
     {
       "id": 2,
