@@ -792,6 +792,103 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
   margin-bottom: 22px;
   line-height: 1.55;
 }
+
+/* ===== LOCKED VIEW (avant samedi 25 avril 08h00) ===== */
+.equipe-locked-view[hidden] { display: none; }
+.equipe-list-view[hidden] { display: none; }
+
+.locked-countdown {
+  margin: 4px 24px 28px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 18px 10px;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+.locked-countdown::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(132,196,65,0.08), transparent 60%);
+  pointer-events: none;
+}
+.lc-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+.lc-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+  text-align: center;
+}
+.lc-lbl {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.locked-teaser-label {
+  margin: 0 24px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+.locked-teaser {
+  margin: 0 24px 20px;
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 4px;
+  padding: 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.lt-cell {
+  aspect-ratio: 1 / 1;
+  background: var(--tc);
+  border-radius: 4px;
+  filter: blur(2.5px) saturate(1.2);
+  opacity: 0.55;
+  animation: lt-pulse 3.6s ease-in-out infinite;
+}
+.lt-cell:nth-child(1) { animation-delay: 0s; }
+.lt-cell:nth-child(2) { animation-delay: 0.35s; }
+.lt-cell:nth-child(3) { animation-delay: 0.70s; }
+.lt-cell:nth-child(4) { animation-delay: 1.05s; }
+.lt-cell:nth-child(5) { animation-delay: 1.40s; }
+.lt-cell:nth-child(6) { animation-delay: 1.75s; }
+.lt-cell:nth-child(7) { animation-delay: 2.10s; }
+.lt-cell:nth-child(8) { animation-delay: 2.45s; }
+.lt-cell:nth-child(9) { animation-delay: 2.80s; }
+@keyframes lt-pulse {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%      { opacity: 0.85; transform: scale(1.05); }
+}
+
+.locked-footnote {
+  margin: 0 24px 40px;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.55;
+  text-align: center;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.04em;
+}
+
 .search-wrap { position: relative; margin-bottom: 8px; }
 .search-icon {
   position: absolute;
@@ -2822,8 +2919,39 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
         <!-- ============== ÉQUIPE ============== -->
         <section class="screen" data-screen="equipe">
 
+          <!-- LOCKED VIEW (avant samedi 25 avril 08h00) -->
+          <div class="equipe-locked-view" data-view="locked" hidden>
+            <div class="equipe-hero">
+              <div class="section-eyebrow">MON ÉQUIPE</div>
+              <h2 class="equipe-title">Ta couleur sera<br>révélée samedi.</h2>
+              <p class="equipe-sub">Rendez-vous le 25 avril à 08h00. Tu découvriras ton équipe, tes 14 co-équipiers, et votre point de rassemblement.</p>
+            </div>
+
+            <div class="locked-countdown" aria-live="polite">
+              <div class="lc-unit"><span class="lc-num" data-lc="d">—</span><span class="lc-lbl">JOURS</span></div>
+              <div class="lc-unit"><span class="lc-num" data-lc="h">—</span><span class="lc-lbl">HEURES</span></div>
+              <div class="lc-unit"><span class="lc-num" data-lc="m">—</span><span class="lc-lbl">MIN</span></div>
+              <div class="lc-unit"><span class="lc-num" data-lc="s">—</span><span class="lc-lbl">SEC</span></div>
+            </div>
+
+            <div class="locked-teaser-label">LES 9 COULEURS · TEASER</div>
+            <div class="locked-teaser">
+              <div class="lt-cell" style="--tc:#06B6D4"></div>
+              <div class="lt-cell" style="--tc:#A855F7"></div>
+              <div class="lt-cell" style="--tc:#F97316"></div>
+              <div class="lt-cell" style="--tc:#3B82F6"></div>
+              <div class="lt-cell" style="--tc:#FACC15"></div>
+              <div class="lt-cell" style="--tc:#EF4444"></div>
+              <div class="lt-cell" style="--tc:#14B8A6"></div>
+              <div class="lt-cell" style="--tc:#EC4899"></div>
+              <div class="lt-cell" style="--tc:#F5F5F5"></div>
+            </div>
+
+            <div class="locked-footnote">Les 135 décodeurs seront répartis aléatoirement<br>dans les 9 équipes le matin de l'événement.</div>
+          </div>
+
           <!-- LIST VIEW -->
-          <div class="equipe-list-view" data-view="list">
+          <div class="equipe-list-view" data-view="list" hidden>
             <div class="equipe-hero">
               <div class="section-eyebrow">MON ÉQUIPE</div>
               <h2 class="equipe-title">Trouve ton équipe.</h2>
@@ -3130,7 +3258,7 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
                     <div class="cs-n">02</div>
                     <div class="cs-body">
                       <div class="cs-title">TENUE</div>
-                      <div class="cs-txt">Tu reçois un <strong>t-shirt + casquette Decode 26</strong> à l'arrivée. Porte-les pour toute la journée. En dessous : tenue sport décontractée, chaussures fermées confortables (on marche, on court, on cherche).</div>
+                      <div class="cs-txt">Tu reçois un <strong>t-shirt Decode 26</strong> à l'arrivée. Porte-le pour toute la journée. En dessous : tenue sport décontractée, chaussures fermées confortables (on marche, on court, on cherche).</div>
                     </div>
                   </li>
 
@@ -3146,7 +3274,7 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
                     <div class="cs-n">04</div>
                     <div class="cs-body">
                       <div class="cs-title">SOLEIL & CRÈME</div>
-                      <div class="cs-txt">Avril à Rabat peut taper fort entre 13h et 16h. <strong>Crème solaire, lunettes</strong>, casquette (fournie). Pas de jeu debout sous le soleil sans protection.</div>
+                      <div class="cs-txt">Avril à Rabat peut taper fort entre 13h et 16h. <strong>Crème solaire et lunettes</strong> recommandées. Pas de jeu debout sous le soleil sans protection.</div>
                     </div>
                   </li>
 
@@ -3204,56 +3332,40 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 
                   <div class="contact">
                     <div class="contact-head">
-                      <div class="contact-avatar" style="--ac:#84C441">ML</div>
-                      <div class="contact-meta">
-                        <div class="contact-name">MEHDI LAHBABI</div>
-                        <div class="contact-role">MRCO · Chef de projet · Jour J</div>
-                      </div>
-                    </div>
-                    <div class="contact-actions">
-                      <a class="contact-btn" href="tel:+212600000000">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
-                        Appeler
-                      </a>
-                      <a class="contact-btn wa" href="https://wa.me/212600000000" target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.95-.25-.1-.45-.15-.65.15s-.7.95-.9 1.15c-.15.2-.3.2-.6.05-1.7-.85-2.8-1.5-3.9-3.45-.3-.5.3-.5.85-1.6.1-.2 0-.35-.05-.5s-.65-1.55-.9-2.15c-.25-.55-.5-.45-.65-.5h-.55c-.2 0-.5.05-.8.35-.25.3-1.05 1.05-1.05 2.5s1.1 2.9 1.25 3.1c.15.2 2.15 3.3 5.25 4.6 2 .8 2.75.85 3.75.75.6-.1 1.7-.7 1.95-1.35.25-.7.25-1.25.15-1.35-.05-.1-.25-.15-.55-.3zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5-1.3c1.4.8 3.1 1.3 5 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
-                        WhatsApp
-                      </a>
-                    </div>
-                  </div>
-
-                  <div class="contact">
-                    <div class="contact-head">
-                      <div class="contact-avatar" style="--ac:#06B6D4">EB</div>
-                      <div class="contact-meta">
-                        <div class="contact-name">EVA BRUNNICH</div>
-                        <div class="contact-role">MRCO · RP terrain · Jour J</div>
-                      </div>
-                    </div>
-                    <div class="contact-actions">
-                      <a class="contact-btn" href="tel:+212600000000">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
-                        Appeler
-                      </a>
-                      <a class="contact-btn wa" href="https://wa.me/212600000000" target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.95-.25-.1-.45-.15-.65.15s-.7.95-.9 1.15c-.15.2-.3.2-.6.05-1.7-.85-2.8-1.5-3.9-3.45-.3-.5.3-.5.85-1.6.1-.2 0-.35-.05-.5s-.65-1.55-.9-2.15c-.25-.55-.5-.45-.65-.5h-.55c-.2 0-.5.05-.8.35-.25.3-1.05 1.05-1.05 2.5s1.1 2.9 1.25 3.1c.15.2 2.15 3.3 5.25 4.6 2 .8 2.75.85 3.75.75.6-.1 1.7-.7 1.95-1.35.25-.7.25-1.25.15-1.35-.05-.1-.25-.15-.55-.3zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5-1.3c1.4.8 3.1 1.3 5 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
-                        WhatsApp
-                      </a>
-                    </div>
-                  </div>
-
-                  <div class="contact">
-                    <div class="contact-head">
                       <div class="contact-avatar" style="--ac:#86BC25">YS</div>
                       <div class="contact-meta">
                         <div class="contact-name">YOUNES SAIDI</div>
-                        <div class="contact-role">Deloitte · Responsable événement</div>
+                        <div class="contact-role">Deloitte · Organisation</div>
                       </div>
                     </div>
                     <div class="contact-actions">
-                      <a class="contact-btn" href="mailto:ysaidi@deloitte.fr">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                        Email
+                      <a class="contact-btn" href="tel:+212663869059">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+                        Appeler
+                      </a>
+                      <a class="contact-btn wa" href="https://wa.me/212663869059" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.95-.25-.1-.45-.15-.65.15s-.7.95-.9 1.15c-.15.2-.3.2-.6.05-1.7-.85-2.8-1.5-3.9-3.45-.3-.5.3-.5.85-1.6.1-.2 0-.35-.05-.5s-.65-1.55-.9-2.15c-.25-.55-.5-.45-.65-.5h-.55c-.2 0-.5.05-.8.35-.25.3-1.05 1.05-1.05 2.5s1.1 2.9 1.25 3.1c.15.2 2.15 3.3 5.25 4.6 2 .8 2.75.85 3.75.75.6-.1 1.7-.7 1.95-1.35.25-.7.25-1.25.15-1.35-.05-.1-.25-.15-.55-.3zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5-1.3c1.4.8 3.1 1.3 5 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
+                        WhatsApp
+                      </a>
+                    </div>
+                  </div>
+
+                  <div class="contact">
+                    <div class="contact-head">
+                      <div class="contact-avatar" style="--ac:#84C441">MR</div>
+                      <div class="contact-meta">
+                        <div class="contact-name">MRCO ORGA</div>
+                        <div class="contact-role">Agence · Terrain Jour J</div>
+                      </div>
+                    </div>
+                    <div class="contact-actions">
+                      <a class="contact-btn" href="tel:+212663176313">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z"/></svg>
+                        Appeler
+                      </a>
+                      <a class="contact-btn wa" href="https://wa.me/212663176313" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.7-.85-2-.95-.25-.1-.45-.15-.65.15s-.7.95-.9 1.15c-.15.2-.3.2-.6.05-1.7-.85-2.8-1.5-3.9-3.45-.3-.5.3-.5.85-1.6.1-.2 0-.35-.05-.5s-.65-1.55-.9-2.15c-.25-.55-.5-.45-.65-.5h-.55c-.2 0-.5.05-.8.35-.25.3-1.05 1.05-1.05 2.5s1.1 2.9 1.25 3.1c.15.2 2.15 3.3 5.25 4.6 2 .8 2.75.85 3.75.75.6-.1 1.7-.7 1.95-1.35.25-.7.25-1.25.15-1.35-.05-.1-.25-.15-.55-.3zM12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.6 1.4 5.1L2 22l5-1.3c1.4.8 3.1 1.3 5 1.3 5.5 0 10-4.5 10-10S17.5 2 12 2z"/></svg>
+                        WhatsApp
                       </a>
                     </div>
                   </div>
@@ -3578,6 +3690,61 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
       handleSearch();
     });
   }
+
+  // ======= LOCK ÉQUIPE — unlock samedi 25 avril 08h00 (Africa/Casablanca) =======
+  (function initEquipeLock(){
+    const lockedView = document.querySelector('.equipe-locked-view');
+    const listWrap   = document.querySelector('.equipe-list-view');
+    if (!lockedView || !listWrap) return;
+
+    const UNLOCK_AT = new Date('2026-04-25T08:00:00+01:00').getTime();
+    const devUnlock = /[?&]unlock=1\b/.test(location.search);
+
+    const nodes = {
+      d: lockedView.querySelector('[data-lc="d"]'),
+      h: lockedView.querySelector('[data-lc="h"]'),
+      m: lockedView.querySelector('[data-lc="m"]'),
+      s: lockedView.querySelector('[data-lc="s"]'),
+    };
+    function pad2(n){ return String(n).padStart(2,'0'); }
+
+    let unlocked = false;
+    let tickId = null;
+
+    function applyUnlock(){
+      if (unlocked) return;
+      unlocked = true;
+      lockedView.hidden = true;
+      listWrap.hidden = false;
+      if (tickId) { clearInterval(tickId); tickId = null; }
+    }
+    function applyLocked(){
+      lockedView.hidden = false;
+      listWrap.hidden = true;
+    }
+
+    function tickLock(){
+      const now = Date.now();
+      if (devUnlock || now >= UNLOCK_AT) { applyUnlock(); return; }
+      let diff = UNLOCK_AT - now;
+      const d = Math.floor(diff / 86400000); diff %= 86400000;
+      const h = Math.floor(diff / 3600000);  diff %= 3600000;
+      const m = Math.floor(diff / 60000);    diff %= 60000;
+      const sec = Math.floor(diff / 1000);
+      if (nodes.d) nodes.d.textContent = pad2(d);
+      if (nodes.h) nodes.h.textContent = pad2(h);
+      if (nodes.m) nodes.m.textContent = pad2(m);
+      if (nodes.s) nodes.s.textContent = pad2(sec);
+    }
+
+    if (devUnlock || Date.now() >= UNLOCK_AT) {
+      applyUnlock();
+    } else {
+      applyLocked();
+      tickLock();
+      tickId = setInterval(tickLock, 1000);
+    }
+  })();
 
   // Team detail
   const listView = document.querySelector('.equipe-list-view');
