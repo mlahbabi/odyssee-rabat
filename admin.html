@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin · Odyssée Rabat</title>
+<style>
+  :root {
+    --bg: #0B0D12;
+    --panel: #121520;
+    --panel-2: #1a1e2c;
+    --text: #E8EAF0;
+    --muted: #8C929E;
+    --line: #262b3a;
+    --green: #84C441;
+    --green-2: #5fa828;
+    --red: #EF4444;
+    --amber: #F59E0B;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+    padding-bottom: 80px;
+  }
+  header.topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; background: var(--bg); z-index: 5;
+  }
+  .brand { font-weight: 800; letter-spacing: -0.01em; font-size: 16px; }
+  .brand .pill { display: inline-block; background: var(--green); color: #0b0d12; font-size: 10px; padding: 2px 7px; border-radius: 6px; margin-left: 6px; font-weight: 800; letter-spacing: 0.04em; }
+  .logout { background: transparent; border: 1px solid var(--line); color: var(--muted); padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+  .logout:hover { color: var(--text); }
+
+  /* Gate PIN */
+  .gate { padding: 60px 20px 20px; max-width: 360px; margin: 0 auto; text-align: center; }
+  .gate h1 { font-size: 22px; margin: 0 0 4px; font-weight: 800; letter-spacing: -0.01em; }
+  .gate p { color: var(--muted); font-size: 13px; margin: 0 0 28px; }
+  .pin-input {
+    width: 100%; padding: 18px 20px; font-size: 28px; text-align: center; letter-spacing: 14px;
+    background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: var(--radius);
+    font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .pin-input:focus { outline: 2px solid var(--green); outline-offset: 2px; border-color: var(--green); }
+  .pin-submit {
+    width: 100%; padding: 16px; margin-top: 14px; background: var(--green); color: #0b0d12;
+    border: 0; border-radius: var(--radius); font-weight: 800; font-size: 15px;
+  }
+  .pin-submit:disabled { opacity: 0.4; }
+  .pin-error { color: var(--red); font-size: 13px; margin-top: 12px; min-height: 18px; }
+
+  /* Tabs */
+  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 12px 12px 0; }
+  .tab {
+    padding: 12px 8px; text-align: center; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--muted);
+  }
+  .tab.active { background: var(--panel-2); color: var(--text); border-color: var(--green); box-shadow: inset 0 0 0 1px var(--green); }
+  .tab small { display: block; font-size: 10px; font-weight: 500; color: var(--muted); margin-top: 2px; }
+  .tab.active small { color: var(--green); }
+
+  main { padding: 14px 12px 20px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; margin-bottom: 14px; }
+  .panel h2 { font-size: 14px; margin: 0 0 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+
+  /* Scoreboard */
+  .status-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field select, .field input[type=number], .field input[type=text], .field textarea {
+    background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+    padding: 10px 12px; border-radius: 8px; font-size: 14px; font-family: inherit;
+  }
+  .field select:focus, .field input:focus, .field textarea:focus { outline: 2px solid var(--green); outline-offset: 1px; border-color: var(--green); }
+
+  .team-row {
+    display: grid; grid-template-columns: 10px 1fr auto; gap: 10px; align-items: center;
+    padding: 10px; border-radius: 10px; background: var(--panel-2); margin-bottom: 6px;
+    border: 1px solid transparent;
+  }
+  .team-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .team-info { display: flex; flex-direction: column; gap: 2px; }
+  .team-name { font-weight: 700; font-size: 14px; }
+  .team-score { font-family: 'Space Grotesk', monospace; font-weight: 800; font-size: 20px; font-variant-numeric: tabular-nums; color: var(--green); }
+  .team-ctrls { display: flex; gap: 4px; flex-wrap: nowrap; }
+  .btn {
+    background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    padding: 8px 10px; border-radius: 8px; font-weight: 700; font-size: 13px;
+    font-family: inherit; cursor: pointer; min-width: 40px;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn-plus { border-color: rgba(132,196,65,0.4); color: var(--green); }
+  .btn-minus { border-color: rgba(239,68,68,0.3); color: var(--red); }
+  .btn-primary { background: var(--green); color: #0b0d12; border-color: var(--green); }
+  .btn-primary:disabled { opacity: 0.5; }
+  .btn-danger { background: transparent; border-color: rgba(239,68,68,0.4); color: var(--red); }
+  .btn-full { width: 100%; padding: 12px; }
+
+  .quick-actions { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 14px; }
+  .quick-actions .btn { padding: 10px 4px; font-size: 12px; }
+
+  /* Photos */
+  .hid-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .hid-chip {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2);
+    border: 1px solid var(--line); padding: 6px 10px; border-radius: 6px; font-size: 12px;
+    font-family: monospace;
+  }
+  .hid-chip button { background: transparent; border: 0; color: var(--red); font-size: 16px; cursor: pointer; padding: 0 2px; }
+
+  /* Notifs */
+  .notif-level { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .notif-level label {
+    text-align: center; padding: 10px; background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .notif-level input { display: none; }
+  .notif-level input:checked + span { color: var(--green); }
+  .notif-level label:has(input:checked) { border-color: var(--green); background: rgba(132,196,65,0.08); }
+  .notif-list { margin-top: 14px; }
+  .notif-item {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px;
+    margin-bottom: 6px; display: grid; grid-template-columns: 1fr auto; gap: 8px;
+  }
+  .notif-item .ni-title { font-weight: 700; font-size: 13px; }
+  .notif-item .ni-body { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .notif-item .ni-meta { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .notif-item.lvl-urgent { border-left: 3px solid var(--red); }
+  .notif-item.lvl-info { border-left: 3px solid var(--green); }
+  .notif-item .del { background: transparent; border: 0; color: var(--muted); font-size: 18px; cursor: pointer; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 16px; left: 12px; right: 12px;
+    background: var(--panel); border: 1px solid var(--green);
+    color: var(--text); padding: 12px 14px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; z-index: 20;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    transform: translateY(120%); transition: transform 0.35s ease;
+  }
+  .toast.show { transform: translateY(0); }
+  .toast.err { border-color: var(--red); }
+  .toast.err::before { content: "✕  "; color: var(--red); font-weight: 800; }
+  .toast:not(.err)::before { content: "✓  "; color: var(--green); font-weight: 800; }
+
+  /* Busy overlay */
+  .busy { position: fixed; inset: 0; background: rgba(11,13,18,0.6); display: none; align-items: center; justify-content: center; z-index: 30; }
+  .busy.show { display: flex; }
+  .spin { width: 38px; height: 38px; border: 3px solid var(--line); border-top-color: var(--green); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- ===== GATE PIN ===== -->
+<section class="gate" id="gate">
+  <h1>Admin Odyssée</h1>
+  <p>Entre le code PIN pour piloter l'événement</p>
+  <form id="pinForm" autocomplete="off">
+    <input class="pin-input" id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autofocus>
+    <button type="submit" class="pin-submit" id="pinSubmit">Ouvrir</button>
+    <div class="pin-error" id="pinError"></div>
+  </form>
+</section>
+
+<!-- ===== APP ===== -->
+<div id="app" hidden>
+  <header class="topbar">
+    <div class="brand">ODYSSÉE <span class="pill">ADMIN</span></div>
+    <button class="logout" id="logoutBtn">Fermer</button>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="score">Scoreboard<small>9 équipes</small></button>
+    <button class="tab" data-tab="photos">Photos<small>Modération</small></button>
+    <button class="tab" data-tab="notifs">Notifs<small>Push live</small></button>
+  </nav>
+
+  <main>
+    <!-- ===== PANE SCORE ===== -->
+    <section class="pane" data-pane="score">
+      <div class="panel">
+        <h2>Statut partie</h2>
+        <div class="status-row">
+          <div class="field">
+            <label for="selStatus">Statut</label>
+            <select id="selStatus">
+              <option value="pre-event">En attente</option>
+              <option value="live">En direct</option>
+              <option value="paused">Pause</option>
+              <option value="final">Terminé</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="inpRound">Round (sur 6)</label>
+            <input type="number" id="inpRound" min="0" max="6" step="1" value="0">
+          </div>
+        </div>
+        <div class="field" style="margin-top:8px">
+          <label for="inpStatusLabel">Libellé affiché</label>
+          <input type="text" id="inpStatusLabel" placeholder="En attente du coup d'envoi">
+        </div>
+        <button class="btn btn-primary btn-full" id="btnStatusSave" style="margin-top:12px">Publier le statut</button>
+      </div>
+
+      <div class="panel">
+        <h2>Points par équipe</h2>
+        <div id="teamsList"></div>
+        <div class="quick-actions">
+          <button class="btn" data-qa="-5">−5</button>
+          <button class="btn" data-qa="-1">−1</button>
+          <button class="btn btn-plus" data-qa="1">+1</button>
+          <button class="btn btn-plus" data-qa="5">+5</button>
+          <button class="btn btn-plus" data-qa="10">+10</button>
+        </div>
+        <p style="color: var(--muted); font-size: 11px; margin-top: 10px;">Sélectionne une équipe puis utilise les raccourcis. Les boutons par ligne incrémentent de +1.</p>
+        <button class="btn btn-danger btn-full" id="btnResetAll" style="margin-top:10px">Réinitialiser tous les scores</button>
+      </div>
+    </section>
+
+    <!-- ===== PANE PHOTOS ===== -->
+    <section class="pane" data-pane="photos" hidden>
+      <div class="panel">
+        <h2>Masquer une photo</h2>
+        <div class="field">
+          <label for="inpHideId">Public ID Cloudinary (ou copier depuis le mur)</label>
+          <input type="text" id="inpHideId" placeholder="ex: bnbliv5pezwx3cy8mpzr">
+        </div>
+        <button class="btn btn-primary btn-full" id="btnHide" style="margin-top:10px">Masquer</button>
+      </div>
+
+      <div class="panel">
+        <h2>Photos masquées</h2>
+        <div class="hid-list" id="hidList"></div>
+        <button class="btn btn-danger btn-full" id="btnClearHidden" style="margin-top:12px">Tout démasquer</button>
+      </div>
+    </section>
+
+    <!-- ===== PANE NOTIFS ===== -->
+    <section class="pane" data-pane="notifs" hidden>
+      <div class="panel">
+        <h2>Nouvelle notification</h2>
+        <div class="field" style="margin-bottom:10px">
+          <label for="inpNotifTitle">Titre (court)</label>
+          <input type="text" id="inpNotifTitle" maxlength="80" placeholder="ex: Round 3 dans 5 min">
+        </div>
+        <div class="field" style="margin-bottom:10px">
+          <label for="inpNotifBody">Message</label>
+          <textarea id="inpNotifBody" rows="3" maxlength="400" placeholder="Détail optionnel"></textarea>
+        </div>
+        <div class="notif-level">
+          <label><input type="radio" name="lvl" value="normal" checked><span>Normal</span></label>
+          <label><input type="radio" name="lvl" value="info"><span>Info</span></label>
+          <label><input type="radio" name="lvl" value="urgent"><span>Urgent</span></label>
+        </div>
+        <button class="btn btn-primary btn-full" id="btnNotifPush" style="margin-top:12px">Publier la notif</button>
+      </div>
+
+      <div class="panel">
+        <h2>Dernières notifs</h2>
+        <div class="notif-list" id="notifList"></div>
+        <button class="btn btn-danger btn-full" id="btnNotifClear" style="margin-top:8px">Tout supprimer</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="busy" id="busy"><div class="spin"></div></div>
+
+<script>
+(function(){
+  'use strict';
+
+  const API = '/.netlify/functions/admin-write';
+  const DATA_BASE = '/data'; // lecture locale (même origin)
+
+  const TEAMS = [
+    { id:1, name:'Cyan',      color:'#06B6D4' },
+    { id:2, name:'Violet',    color:'#A855F7' },
+    { id:3, name:'Orange',    color:'#F97316' },
+    { id:4, name:'Bleu',      color:'#3B82F6' },
+    { id:5, name:'Or',        color:'#FACC15' },
+    { id:6, name:'Vermillon', color:'#EF4444' },
+    { id:7, name:'Teal',      color:'#14B8A6' },
+    { id:8, name:'Magenta',   color:'#EC4899' },
+    { id:9, name:'Ivoire',    color:'#F5F5F5' }
+  ];
+
+  // ===== State =====
+  let pin = sessionStorage.getItem('admin_pin') || '';
+  let selectedTeam = null;
+  let state = {
+    scoreboard: { teams: [], status: 'pre-event', round: 0, statusLabel: '' },
+    photos: { hiddenIds: [] },
+    notifs: { notifs: [] }
+  };
+
+  // ===== DOM =====
+  const $ = s => document.querySelector(s);
+  const toast = (msg, err) => {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.toggle('err', !!err);
+    t.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => t.classList.remove('show'), 3000);
+  };
+  const busy = v => $('#busy').classList.toggle('show', !!v);
+
+  // ===== Data fetch (lecture JSON direct, avec bust cache) =====
+  async function loadJson(path){
+    const res = await fetch(path + '?t=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('Load ' + path + ' failed: ' + res.status);
+    return res.json();
+  }
+  async function refreshAll(){
+    try {
+      const [sb, ph, no] = await Promise.all([
+        loadJson(DATA_BASE + '/scoreboard.json'),
+        loadJson(DATA_BASE + '/photo-moderation.json'),
+        loadJson(DATA_BASE + '/notifications.json')
+      ]);
+      state.scoreboard = sb;
+      state.photos = ph;
+      state.notifs = no;
+      renderAll();
+    } catch (e) {
+      toast('Lecture échouée: ' + e.message, true);
+    }
+  }
+
+  // ===== API write =====
+  async function write(action, payload){
+    busy(true);
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin, action, payload: payload || {} })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || ('HTTP ' + res.status));
+      }
+      toast('OK · ' + action + (data.commit ? ' · ' + data.commit : ''));
+      // Rafraîchir le state local depuis git (latence ~5s mais on met à jour optimiste)
+      setTimeout(refreshAll, 2500);
+      return data;
+    } catch (e) {
+      toast('Échec: ' + e.message, true);
+      throw e;
+    } finally {
+      busy(false);
+    }
+  }
+
+  // ===== Gate PIN =====
+  function unlock() {
+    $('#gate').hidden = true;
+    $('#app').hidden = false;
+    refreshAll();
+  }
+  function lock(){
+    sessionStorage.removeItem('admin_pin');
+    pin = '';
+    $('#gate').hidden = false;
+    $('#app').hidden = true;
+    $('#pinInput').value = '';
+    $('#pinInput').focus();
+  }
+
+  $('#pinForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const val = $('#pinInput').value.trim();
+    if (val.length !== 4) { $('#pinError').textContent = 'Code à 4 chiffres'; return; }
+    // Test silencieux en tentant une action valide mais neutre: on fait une action fake qui retourne 400 si PIN ok, 401 sinon
+    $('#pinError').textContent = '';
+    $('#pinSubmit').disabled = true;
+    try {
+      const res = await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: val, action: '__ping__' })
+      });
+      if (res.status === 401) { $('#pinError').textContent = 'PIN invalide'; return; }
+      // 400 = PIN OK mais action inconnue = jackpot
+      pin = val;
+      sessionStorage.setItem('admin_pin', pin);
+      unlock();
+    } catch (e) {
+      $('#pinError').textContent = 'Erreur réseau';
+    } finally {
+      $('#pinSubmit').disabled = false;
+    }
+  });
+  $('#logoutBtn').addEventListener('click', lock);
+
+  // ===== Tabs =====
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const k = btn.dataset.tab;
+      document.querySelectorAll('.tab').forEach(b => b.classList.toggle('active', b === btn));
+      document.querySelectorAll('.pane').forEach(p => p.hidden = (p.dataset.pane !== k));
+    });
+  });
+
+  // ===== Render scoreboard =====
+  function renderScoreboard(){
+    const sb = state.scoreboard || {};
+    $('#selStatus').value = sb.status || 'pre-event';
+    $('#inpRound').value = sb.round || 0;
+    $('#inpStatusLabel').value = sb.statusLabel || '';
+
+    // Merge teams from live data
+    const scores = {};
+    (sb.teams || []).forEach(t => scores[t.id] = t.score || 0);
+
+    const html = TEAMS.map(t => {
+      const score = scores[t.id] || 0;
+      const isSel = selectedTeam === t.id;
+      return `
+        <div class="team-row" style="${isSel ? 'border-color: var(--green); background: rgba(132,196,65,0.08);' : ''}" data-team="${t.id}">
+          <span class="team-dot" style="background:${t.color}"></span>
+          <div class="team-info">
+            <div class="team-name">${t.name}</div>
+            <div class="team-score">${score}</div>
+          </div>
+          <div class="team-ctrls">
+            <button class="btn btn-minus" data-delta="-1" data-team="${t.id}">−1</button>
+            <button class="btn btn-plus" data-delta="1" data-team="${t.id}">+1</button>
+          </div>
+        </div>`;
+    }).join('');
+    $('#teamsList').innerHTML = html;
+
+    // Events
+    $('#teamsList').querySelectorAll('.team-row').forEach(row => {
+      row.addEventListener('click', (e) => {
+        if (e.target.closest('button')) return;
+        selectedTeam = Number(row.dataset.team);
+        renderScoreboard();
+      });
+    });
+    $('#teamsList').querySelectorAll('button[data-delta]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const teamId = Number(btn.dataset.team);
+        const delta = Number(btn.dataset.delta);
+        selectedTeam = teamId;
+        write('scoreboard.delta', { teamId, delta });
+      });
+    });
+  }
+
+  // Quick actions: +5/+10/-5 etc. sur équipe sélectionnée
+  document.querySelectorAll('.quick-actions .btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (!selectedTeam) { toast('Sélectionne une équipe', true); return; }
+      const delta = Number(btn.dataset.qa);
+      write('scoreboard.delta', { teamId: selectedTeam, delta });
+    });
+  });
+
+  $('#btnStatusSave').addEventListener('click', () => {
+    write('scoreboard.setStatus', {
+      status: $('#selStatus').value,
+      round: Number($('#inpRound').value) || 0,
+      statusLabel: $('#inpStatusLabel').value.trim()
+    });
+  });
+
+  $('#btnResetAll').addEventListener('click', () => {
+    if (!confirm('Réinitialiser TOUS les scores à 0 ? Cette action recommittera sur GitHub.')) return;
+    write('scoreboard.resetAll', {});
+  });
+
+  // ===== Render photos =====
+  function renderPhotos(){
+    const ids = (state.photos && state.photos.hiddenIds) || [];
+    if (!ids.length) {
+      $('#hidList').innerHTML = '<span style="color:var(--muted);font-size:12px">Aucune photo masquée</span>';
+      return;
+    }
+    $('#hidList').innerHTML = ids.map(id =>
+      `<span class="hid-chip">${id}<button data-unhide="${id}" aria-label="Démasquer">×</button></span>`
+    ).join('');
+    $('#hidList').querySelectorAll('button[data-unhide]').forEach(btn => {
+      btn.addEventListener('click', () => write('photos.unhide', { id: btn.dataset.unhide }));
+    });
+  }
+  $('#btnHide').addEventListener('click', () => {
+    const id = $('#inpHideId').value.trim();
+    if (!id) { toast('ID requis', true); return; }
+    write('photos.hide', { id }).then(() => $('#inpHideId').value = '');
+  });
+  $('#btnClearHidden').addEventListener('click', () => {
+    if (!confirm('Démasquer toutes les photos ?')) return;
+    write('photos.clearAll', {});
+  });
+
+  // ===== Render notifs =====
+  function renderNotifs(){
+    const list = (state.notifs && state.notifs.notifs) || [];
+    if (!list.length) {
+      $('#notifList').innerHTML = '<span style="color:var(--muted);font-size:12px">Aucune notif active</span>';
+      return;
+    }
+    $('#notifList').innerHTML = list.slice(0, 8).map(n => {
+      const when = new Date(n.ts).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+      return `<div class="notif-item lvl-${n.level || 'normal'}">
+        <div>
+          <div class="ni-title">${escapeHtml(n.title || '')}</div>
+          ${n.body ? `<div class="ni-body">${escapeHtml(n.body)}</div>` : ''}
+          <div class="ni-meta">${when} · ${n.level || 'normal'}</div>
+        </div>
+        <button class="del" data-del="${n.id}" aria-label="Supprimer">×</button>
+      </div>`;
+    }).join('');
+    $('#notifList').querySelectorAll('button[data-del]').forEach(btn => {
+      btn.addEventListener('click', () => write('notifs.delete', { id: btn.dataset.del }));
+    });
+  }
+  function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  $('#btnNotifPush').addEventListener('click', () => {
+    const title = $('#inpNotifTitle').value.trim();
+    const body = $('#inpNotifBody').value.trim();
+    const level = document.querySelector('input[name=lvl]:checked').value;
+    if (!title && !body) { toast('Titre ou message requis', true); return; }
+    write('notifs.push', { title, body, level }).then(() => {
+      $('#inpNotifTitle').value = '';
+      $('#inpNotifBody').value = '';
+    });
+  });
+  $('#btnNotifClear').addEventListener('click', () => {
+    if (!confirm('Supprimer toutes les notifs ?')) return;
+    write('notifs.clearAll', {});
+  });
+
+  function renderAll(){ renderScoreboard(); renderPhotos(); renderNotifs(); }
+
+  // ===== Auto-refresh toutes les 12s si onglet visible =====
+  setInterval(() => {
+    if (!document.hidden && !$('#app').hidden) refreshAll();
+  }, 12000);
+
+  // ===== Boot =====
+  if (pin) unlock();
+})();
+</script>
+</body>
+</html>
