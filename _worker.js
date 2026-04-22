@@ -1,16 +1,9 @@
-// Odyssée Rabat — Admin write proxy (Cloudflare Pages Functions)
-// POST /api/admin-write
-// Body JSON: { pin: "8247", action: "<module>.<verb>", payload: { ... } }
-//
-// Env vars requises (Cloudflare → Pages project → Settings → Environment variables):
-//   ADMIN_PIN       ex: 8247
-//   GITHUB_TOKEN    fine-grained PAT avec Contents Read/Write sur le repo
-//   GITHUB_REPO     ex: mlahbabi/odyssee-rabat
-//   GITHUB_BRANCH   ex: main
+// Odyssée Rabat — _worker.js (mode avancé Cloudflare Pages)
+// Compatible Direct Upload (drag & drop). Route POST /api/admin-write et
+// délègue tout le reste aux assets statiques via env.ASSETS.fetch.
 
 const GH = 'https://api.github.com';
 
-// ---------- Helpers ----------
 function now() { return new Date().toISOString().replace(/\.\d+Z$/, 'Z'); }
 
 function jsonResponse(status, body) {
@@ -24,7 +17,6 @@ function jsonResponse(status, body) {
   });
 }
 
-// UTF-8 safe base64 (Cloudflare Workers runtime n'a pas Buffer)
 function b64ToStr(b64) {
   const binary = atob(b64);
   const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
@@ -81,9 +73,7 @@ async function ghPutJson(repo, branch, path, data, sha, message, token) {
   return res.json();
 }
 
-// ---------- Actions ----------
 const ACTIONS = {
-  // Scoreboard
   'scoreboard.delta': ({ data, payload }) => {
     const teamId = Number(payload.teamId);
     const delta = Number(payload.delta);
@@ -117,8 +107,6 @@ const ACTIONS = {
     data.statusLabel = "En attente du coup d'envoi";
     return { reset: true };
   },
-
-  // Photos (modération)
   'photos.hide': ({ data, payload }) => {
     const id = String(payload.id || '').trim();
     if (!id) throw new Error('id requis');
@@ -136,8 +124,6 @@ const ACTIONS = {
     data.hiddenIds = [];
     return { hiddenIds: [] };
   },
-
-  // Notifications
   'notifs.push': ({ data, payload }) => {
     const { title, body, level } = payload || {};
     if (!title && !body) throw new Error('title ou body requis');
@@ -171,10 +157,7 @@ const FILE_FOR_MODULE = {
   notifs: 'data/notifications.json'
 };
 
-// ---------- Handler (Cloudflare Pages Functions) ----------
-export async function onRequest(context) {
-  const { request, env } = context;
-
+async function handleAdminWrite(request, env) {
   if (request.method === 'OPTIONS') {
     return new Response(null, {
       status: 204,
@@ -230,3 +213,17 @@ export async function onRequest(context) {
     return jsonResponse(500, { error: err.message || String(err) });
   }
 }
+
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+
+    // Route API
+    if (url.pathname === '/api/admin-write') {
+      return handleAdminWrite(request, env);
+    }
+
+    // Tous les autres chemins → assets statiques
+    return env.ASSETS.fetch(request);
+  }
+};
