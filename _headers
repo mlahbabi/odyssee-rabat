@@ -1,0 +1,12 @@
+# Cloudflare Pages — headers config
+# Doc : https://developers.cloudflare.com/pages/configuration/headers/
+
+# Admin page : non indexable
+/admin*
+  X-Robots-Tag: noindex, nofollow
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
+
+# API functions : pas de cache
+/api/*
+  Cache-Control: no-store
