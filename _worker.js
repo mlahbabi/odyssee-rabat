@@ -214,13 +214,55 @@ async function handleAdminWrite(request, env) {
   }
 }
 
+// GET /api/live/:filename  — proxy qui lit l'API GitHub Contents (fresh)
+// au lieu de raw.githubusercontent.com (cache 5 min).
+// Edge-cache 3 sec via Cache-Control → polls fréquents sans exploser le worker quota.
+const ALLOWED_LIVE_FILES = new Set(['scoreboard.json', 'notifications.json', 'photo-moderation.json']);
+
+async function handleLiveRead(request, env, filename) {
+  if (!ALLOWED_LIVE_FILES.has(filename)) {
+    return jsonResponse(404, { error: 'file not allowed' });
+  }
+  const { GITHUB_TOKEN, GITHUB_REPO, GITHUB_BRANCH } = env;
+  if (!GITHUB_TOKEN || !GITHUB_REPO) {
+    return jsonResponse(500, { error: 'Config serveur incomplète' });
+  }
+  const branch = GITHUB_BRANCH || 'main';
+  try {
+    const apiUrl = `${GH}/repos/${GITHUB_REPO}/contents/${encodeURIComponent('data/' + filename)}?ref=${encodeURIComponent(branch)}`;
+    const res = await fetch(apiUrl, { headers: ghHeaders(GITHUB_TOKEN), cf: { cacheTtl: 3, cacheEverything: true } });
+    if (!res.ok) {
+      const t = await res.text();
+      return jsonResponse(502, { error: 'GitHub API fetch failed: ' + res.status, detail: t.slice(0, 200) });
+    }
+    const meta = await res.json();
+    const decoded = b64ToStr(meta.content.replace(/\n/g, ''));
+    return new Response(decoded, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=3, s-maxage=3',
+        'Access-Control-Allow-Origin': '*'
+      }
+    });
+  } catch (err) {
+    return jsonResponse(500, { error: err.message || String(err) });
+  }
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // Route API
+    // Route API admin
     if (url.pathname === '/api/admin-write') {
       return handleAdminWrite(request, env);
+    }
+
+    // Route live-data proxy (scoreboard/notifs/photos modération)
+    if (url.pathname.startsWith('/api/live/')) {
+      const filename = url.pathname.substring('/api/live/'.length);
+      return handleLiveRead(request, env, filename);
     }
 
     // Tous les autres chemins → assets statiques
