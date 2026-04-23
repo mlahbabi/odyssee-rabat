@@ -3980,7 +3980,7 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
     }
 
     function fetchScoreboard(){
-      fetch('/data/scoreboard.json?t=' + Date.now(), { cache: 'no-store' })
+      fetch('https://raw.githubusercontent.com/mlahbabi/odyssee-rabat/main/data/scoreboard.json?t=' + Date.now(), { cache: 'no-store' })
         .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
         .then(render)
         .catch(renderError);
@@ -4108,7 +4108,7 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 
     // ----- Manual notifs polling -----
     function fetchNotifs(){
-      fetch('/data/notifications.json?t=' + Date.now(), { cache: 'no-store' })
+      fetch('https://raw.githubusercontent.com/mlahbabi/odyssee-rabat/main/data/notifications.json?t=' + Date.now(), { cache: 'no-store' })
         .then(function(r){ return r.ok ? r.json() : null; })
         .then(function(data){
           if (!data || !Array.isArray(data.notifs)) return;
@@ -4269,7 +4269,7 @@ body { min-height: 100vh; min-height: 100dvh; overflow: hidden; }
 
     // ----- Moderation polling -----
     function fetchModeration(){
-      fetch('/data/photo-moderation.json?t=' + Date.now(), { cache: 'no-store' })
+      fetch('https://raw.githubusercontent.com/mlahbabi/odyssee-rabat/main/data/photo-moderation.json?t=' + Date.now(), { cache: 'no-store' })
         .then(function(r){ return r.ok ? r.json() : null; })
         .then(function(data){
           if (!data || !Array.isArray(data.hiddenIds)) return;
