@@ -1,4 +1,12 @@
 {
-  "updatedAt": "2026-04-23T06:51:34Z",
-  "notifs": []
+  "updatedAt": "2026-04-23T18:55:35Z",
+  "notifs": [
+    {
+      "id": "n_mobudkaf",
+      "ts": "2026-04-23T18:55:35Z",
+      "title": "Info depart",
+      "body": "SOYEZ A L'heure",
+      "level": "info"
+    }
+  ]
 }
