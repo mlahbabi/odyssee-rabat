@@ -1,40 +1,4 @@
 {
-  "updatedAt": "2026-04-24T11:07:59Z",
-  "notifs": [
-    {
-      "id": "n_moct42mx",
-      "ts": "2026-04-24T11:07:59Z",
-      "title": "Test Eva",
-      "body": "Emergency this is only a test",
-      "level": "urgent"
-    },
-    {
-      "id": "n_moct384b",
-      "ts": "2026-04-24T11:07:19Z",
-      "title": "Test eva",
-      "body": "Team ok ?",
-      "level": "normal"
-    },
-    {
-      "id": "n_moct2s74",
-      "ts": "2026-04-24T11:06:59Z",
-      "title": "Test eva",
-      "body": "last call for bus",
-      "level": "info"
-    },
-    {
-      "id": "n_mockxq91",
-      "ts": "2026-04-24T07:19:06Z",
-      "title": "Horaire test",
-      "body": "Message horaire ok 👌",
-      "level": "info"
-    },
-    {
-      "id": "n_mobudkaf",
-      "ts": "2026-04-23T18:55:35Z",
-      "title": "Info depart",
-      "body": "SOYEZ A L'heure",
-      "level": "info"
-    }
-  ]
+  "updatedAt": "2026-04-24T11:11:59Z",
+  "notifs": []
 }
