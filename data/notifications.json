@@ -1,6 +1,13 @@
 {
-  "updatedAt": "2026-04-23T18:55:35Z",
+  "updatedAt": "2026-04-24T07:19:06Z",
   "notifs": [
+    {
+      "id": "n_mockxq91",
+      "ts": "2026-04-24T07:19:06Z",
+      "title": "Horaire test",
+      "body": "Message horaire ok 👌",
+      "level": "info"
+    },
     {
       "id": "n_mobudkaf",
       "ts": "2026-04-23T18:55:35Z",
