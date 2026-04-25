@@ -1,6 +1,13 @@
 {
-  "updatedAt": "2026-04-25T09:53:53Z",
+  "updatedAt": "2026-04-25T10:16:11Z",
   "notifs": [
+    {
+      "id": "n_moe6pbg5",
+      "ts": "2026-04-25T10:16:11Z",
+      "title": "REGLES A SUIVRE",
+      "body": "Soyez prets !",
+      "level": "urgent"
+    },
     {
       "id": "n_moe5wn56",
       "ts": "2026-04-25T09:53:53Z",
