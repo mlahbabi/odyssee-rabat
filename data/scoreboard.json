@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-25T13:34:07Z",
+  "updatedAt": "2026-04-25T13:34:10Z",
   "status": "pre-event",
   "statusLabel": "En attente du coup d'envoi",
   "round": 0,
@@ -57,7 +57,7 @@
       "id": 9,
       "name": "Ivoire",
       "color": "#F5F5F5",
-      "score": 1
+      "score": 11
     }
   ]
 }
