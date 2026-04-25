@@ -1,6 +1,13 @@
 {
-  "updatedAt": "2026-04-25T09:53:50Z",
+  "updatedAt": "2026-04-25T09:53:53Z",
   "notifs": [
+    {
+      "id": "n_moe5wn56",
+      "ts": "2026-04-25T09:53:53Z",
+      "title": "Et faire du pôle un hub innovation",
+      "body": "DELOITTE",
+      "level": "normal"
+    },
     {
       "id": "n_moe0fbln",
       "ts": "2026-04-25T07:20:27Z",
