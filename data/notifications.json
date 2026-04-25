@@ -1,6 +1,13 @@
 {
-  "updatedAt": "2026-04-25T07:05:46Z",
+  "updatedAt": "2026-04-25T07:20:27Z",
   "notifs": [
+    {
+      "id": "n_moe0fbln",
+      "ts": "2026-04-25T07:20:27Z",
+      "title": "WIAM",
+      "body": "Merci de rejoindre immédiatement les bus (CASA) on va faire le départ",
+      "level": "urgent"
+    },
     {
       "id": "n_modzwg0f",
       "ts": "2026-04-25T07:05:46Z",
