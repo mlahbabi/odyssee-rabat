@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-25T13:34:10Z",
+  "updatedAt": "2026-04-25T13:34:18Z",
   "status": "pre-event",
   "statusLabel": "En attente du coup d'envoi",
   "round": 0,
@@ -39,7 +39,7 @@
       "id": 6,
       "name": "Vermillon",
       "color": "#EF4444",
-      "score": 0
+      "score": 5
     },
     {
       "id": 7,
