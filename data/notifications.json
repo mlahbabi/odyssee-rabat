@@ -1,13 +1,6 @@
 {
-  "updatedAt": "2026-04-25T07:23:49Z",
+  "updatedAt": "2026-04-25T09:53:50Z",
   "notifs": [
-    {
-      "id": "n_moe0jne8",
-      "ts": "2026-04-25T07:23:49Z",
-      "title": "Wiam",
-      "body": "Départ dans 2 min - BUS CASA",
-      "level": "normal"
-    },
     {
       "id": "n_moe0fbln",
       "ts": "2026-04-25T07:20:27Z",
