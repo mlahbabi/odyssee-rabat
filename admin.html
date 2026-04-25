@@ -107,14 +107,69 @@
   .quick-actions { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 14px; }
   .quick-actions .btn { padding: 10px 4px; font-size: 12px; }
 
-  /* Photos */
-  .hid-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-  .hid-chip {
-    display: inline-flex; align-items: center; gap: 6px; background: var(--panel-2);
-    border: 1px solid var(--line); padding: 6px 10px; border-radius: 6px; font-size: 12px;
-    font-family: monospace;
+  /* Photos — galerie modération */
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
   }
-  .hid-chip button { background: transparent; border: 0; color: var(--red); font-size: 16px; cursor: pointer; padding: 0 2px; }
+  .photo-card {
+    position: relative;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .photo-card.is-hidden { opacity: 0.55; border-style: dashed; }
+  .photo-thumb {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #0b0d12;
+    overflow: hidden;
+  }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-num {
+    position: absolute;
+    top: 6px; left: 6px;
+    background: rgba(0,0,0,0.75);
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+  }
+  .photo-status {
+    position: absolute;
+    top: 6px; right: 6px;
+    font-size: 10px; font-weight: 700;
+    padding: 3px 7px; border-radius: 4px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .photo-status.visible { background: rgba(132,196,65,0.18); color: var(--green); border: 1px solid rgba(132,196,65,0.4); }
+  .photo-status.hidden  { background: rgba(239,68,68,0.18);  color: var(--red);   border: 1px solid rgba(239,68,68,0.4); }
+  .photo-actions { padding: 8px; }
+  .photo-actions .btn { width: 100%; padding: 8px 4px; font-size: 13px; }
+  .photo-empty {
+    grid-column: 1 / -1;
+    padding: 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+  }
+  .photo-toolbar {
+    display: flex; gap: 8px; align-items: center;
+    margin-bottom: 10px;
+  }
+  .photo-toolbar .btn { padding: 8px 12px; font-size: 12px; }
+  .photo-meta {
+    color: var(--muted); font-size: 12px; flex: 1;
+  }
 
   /* Notifs */
   .notif-level { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -231,18 +286,17 @@
     <!-- ===== PANE PHOTOS ===== -->
     <section class="pane" data-pane="photos" hidden>
       <div class="panel">
-        <h2>Masquer une photo</h2>
-        <div class="field">
-          <label for="inpHideId">Public ID Cloudinary (ou copier depuis le mur)</label>
-          <input type="text" id="inpHideId" placeholder="ex: bnbliv5pezwx3cy8mpzr">
+        <h2>Mur photos · Modération</h2>
+        <div class="photo-toolbar">
+          <span class="photo-meta" id="photoMeta">Chargement…</span>
+          <button class="btn" id="btnRefreshPhotos">↻ Actualiser</button>
         </div>
-        <button class="btn btn-primary btn-full" id="btnHide" style="margin-top:10px">Masquer</button>
-      </div>
-
-      <div class="panel">
-        <h2>Photos masquées</h2>
-        <div class="hid-list" id="hidList"></div>
-        <button class="btn btn-danger btn-full" id="btnClearHidden" style="margin-top:12px">Tout démasquer</button>
+        <div class="photo-grid" id="photoGrid"></div>
+        <p style="color: var(--muted); font-size: 11px; margin-top: 12px;">
+          Clic <strong>Retirer</strong> = la photo disparaît du mur public en ~3 sec.<br>
+          Clic <strong>Réafficher</strong> = elle revient sur le mur. Aucune photo n'est supprimée définitivement de Cloudinary.
+        </p>
+        <button class="btn btn-danger btn-full" id="btnClearHidden" style="margin-top:10px">Tout réafficher (annuler la modération)</button>
       </div>
     </section>
 
@@ -283,7 +337,7 @@
   'use strict';
 
   const API = '/api/admin-write';
-  const DATA_BASE = '/data'; // lecture locale (même origin)
+  const DATA_BASE = '/api/live'; // proxy Worker → API GitHub Contents (fresh < 3s)
 
   const TEAMS = [
     { id:1, name:'Cyan',      color:'#06B6D4' },
@@ -326,7 +380,8 @@
   }
   async function refreshAll(){
     try {
-      const [sb, ph, no] = await Promise.all([
+      const [_, sb, ph, no] = await Promise.all([
+        loadCloudinary(),
         loadJson(DATA_BASE + '/scoreboard.json'),
         loadJson(DATA_BASE + '/photo-moderation.json'),
         loadJson(DATA_BASE + '/notifications.json')
@@ -485,27 +540,81 @@
     write('scoreboard.resetAll', {});
   });
 
-  // ===== Render photos =====
+  // ===== Render photos (galerie miniatures Cloudinary + bouton retirer/réafficher) =====
+  let cloudinaryList = []; // dernier fetch Cloudinary
+  const CLOUDINARY_LIST_URL = 'https://res.cloudinary.com/ddlde7swp/image/list/odyssee-rabat.json';
+  const CLOUDINARY_THUMB = (id) => `https://res.cloudinary.com/ddlde7swp/image/upload/c_fill,w_280,h_280,q_70,f_auto/${id}.jpg`;
+
+  async function loadCloudinary(){
+    try {
+      const res = await fetch(CLOUDINARY_LIST_URL + '?t=' + Date.now(), { cache: 'no-store' });
+      const j = await res.json();
+      cloudinaryList = (j.resources || []).map(r => ({
+        id: r.public_id,
+        ts: r.created_at || r.uploaded_at || null
+      }));
+      // Plus récent en premier (Cloudinary renvoie souvent dans le bon ordre déjà)
+      cloudinaryList.sort((a, b) => (b.ts || '').localeCompare(a.ts || ''));
+    } catch (e) {
+      cloudinaryList = [];
+      console.warn('Cloudinary list failed', e);
+    }
+  }
+
   function renderPhotos(){
-    const ids = (state.photos && state.photos.hiddenIds) || [];
-    if (!ids.length) {
-      $('#hidList').innerHTML = '<span style="color:var(--muted);font-size:12px">Aucune photo masquée</span>';
+    const grid = $('#photoGrid');
+    const meta = $('#photoMeta');
+    const hiddenSet = new Set((state.photos && state.photos.hiddenIds) || []);
+
+    if (!cloudinaryList.length) {
+      grid.innerHTML = '<div class="photo-empty">Aucune photo uploadée pour le moment.</div>';
+      meta.textContent = '0 photo';
       return;
     }
-    $('#hidList').innerHTML = ids.map(id =>
-      `<span class="hid-chip">${id}<button data-unhide="${id}" aria-label="Démasquer">×</button></span>`
-    ).join('');
-    $('#hidList').querySelectorAll('button[data-unhide]').forEach(btn => {
-      btn.addEventListener('click', () => write('photos.unhide', { id: btn.dataset.unhide }));
+
+    const total = cloudinaryList.length;
+    const visible = cloudinaryList.filter(p => !hiddenSet.has(p.id)).length;
+    const hidden = total - visible;
+    meta.innerHTML = `<strong>${total}</strong> photo${total > 1 ? 's' : ''} · ${visible} visible${visible > 1 ? 's' : ''} · ${hidden} masquée${hidden > 1 ? 's' : ''}`;
+
+    grid.innerHTML = cloudinaryList.map((p, idx) => {
+      const isHidden = hiddenSet.has(p.id);
+      const num = idx + 1;
+      return `
+        <div class="photo-card${isHidden ? ' is-hidden' : ''}" data-id="${escapeHtml(p.id)}">
+          <div class="photo-thumb">
+            <img loading="lazy" src="${CLOUDINARY_THUMB(p.id)}" alt="Photo ${num}">
+            <div class="photo-num">#${num}</div>
+            <div class="photo-status ${isHidden ? 'hidden' : 'visible'}">${isHidden ? 'Masquée' : 'Visible'}</div>
+          </div>
+          <div class="photo-actions">
+            ${isHidden
+              ? `<button class="btn btn-plus" data-action="unhide" data-id="${escapeHtml(p.id)}">↺ Réafficher</button>`
+              : `<button class="btn btn-danger" data-action="hide" data-id="${escapeHtml(p.id)}">✕ Retirer du mur</button>`
+            }
+          </div>
+        </div>`;
+    }).join('');
+
+    grid.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const action = btn.dataset.action === 'hide' ? 'photos.hide' : 'photos.unhide';
+        write(action, { id });
+      });
     });
   }
-  $('#btnHide').addEventListener('click', () => {
-    const id = $('#inpHideId').value.trim();
-    if (!id) { toast('ID requis', true); return; }
-    write('photos.hide', { id }).then(() => $('#inpHideId').value = '');
+
+  $('#btnRefreshPhotos').addEventListener('click', async () => {
+    busy(true);
+    try {
+      await loadCloudinary();
+      await refreshAll();
+      toast('Photos rafraîchies');
+    } finally { busy(false); }
   });
   $('#btnClearHidden').addEventListener('click', () => {
-    if (!confirm('Démasquer toutes les photos ?')) return;
+    if (!confirm('Tout réafficher (annule toutes les modérations) ?')) return;
     write('photos.clearAll', {});
   });
 
