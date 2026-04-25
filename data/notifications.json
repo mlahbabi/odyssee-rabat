@@ -1,6 +1,13 @@
 {
-  "updatedAt": "2026-04-25T07:04:47Z",
+  "updatedAt": "2026-04-25T07:05:46Z",
   "notifs": [
+    {
+      "id": "n_modzwg0f",
+      "ts": "2026-04-25T07:05:46Z",
+      "title": "Départ bus",
+      "body": "Les bus sont en place depart 08h30",
+      "level": "normal"
+    },
     {
       "id": "n_modzv68f",
       "ts": "2026-04-25T07:04:47Z",
