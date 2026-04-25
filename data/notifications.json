@@ -1,4 +1,12 @@
 {
-  "updatedAt": "2026-04-24T11:11:59Z",
-  "notifs": []
+  "updatedAt": "2026-04-25T07:04:47Z",
+  "notifs": [
+    {
+      "id": "n_modzv68f",
+      "ts": "2026-04-25T07:04:47Z",
+      "title": "Départ bus",
+      "body": "Bonjour 👋",
+      "level": "normal"
+    }
+  ]
 }
